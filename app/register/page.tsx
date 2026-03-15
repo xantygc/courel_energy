@@ -93,12 +93,12 @@ export default function RegisterPage() {
               {loading ? "Registrando..." : "Crear cuenta"}
             </button>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "1rem 0" }}>
+            {/* <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", margin: "1rem 0" }}>
               <hr style={{ flex: 1, border: "none", borderTop: "1px solid var(--border)" }} />
               <span style={{ fontSize: "11px", color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>o</span>
               <hr style={{ flex: 1, border: "none", borderTop: "1px solid var(--border)" }} />
             </div>
-
+ 
             <button
               type="button"
               onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
@@ -127,7 +127,7 @@ export default function RegisterPage() {
                 <path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-1 2.9-3.1 5.3-5.9 6.8l6.3 5.2C40.8 37 44.5 31 44.5 24c0-1.3-.2-2.7-.2-4z"/>
               </svg>
               Continuar con Google
-            </button>
+            </button> */}
           </form>
         )}
         {!success && (
