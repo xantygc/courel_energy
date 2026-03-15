@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { simularAnual } from "@/lib/calculator";
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -607,10 +608,10 @@ export default function App() {
   return (
     <>
       <div className="nav" style={{flexWrap:"wrap", gap:"1rem", paddingTop:"1rem", paddingBottom:"1rem"}}>
-        <div className="nav-logo" style={{padding:0, borderRight:0, marginRight:0}}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+        <Link href="/" className="nav-logo" style={{padding:0, borderRight:0, marginRight:0, textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "0.5rem"}}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{width: "20px", height: "20px"}}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
           CourelEnergy
-        </div>
+        </Link>
         <div style={{display:"flex", gap: "10px", marginLeft:"2rem"}}>
           <button className={`tab-btn ${tab === 'config' ? 'active' : ''}`} onClick={() => setTab('config')}>Configuración</button>
           <button className={`tab-btn ${tab === 'consumos' ? 'active' : ''}`} onClick={() => setTab('consumos')}>Consumos</button>
