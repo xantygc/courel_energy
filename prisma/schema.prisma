@@ -1,0 +1,134 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AnnualRegulatedCost {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  year                Int       @unique
+  peajeP1             Decimal   @map("peaje_p1") @default(9.2539) @db.Decimal(10, 4)
+  peajeP2             Decimal   @map("peaje_p2") @default(2.8201) @db.Decimal(10, 4)
+  peajeP3             Decimal   @map("peaje_p3") @default(0.2994) @db.Decimal(10, 4)
+  potBoeP1            Decimal   @map("pot_boe_p1") @default(26.93055) @db.Decimal(10, 6)
+  potBoeP2            Decimal   @map("pot_boe_p2") @default(0.697588) @db.Decimal(10, 6)
+  impuestoElectrico   Decimal   @map("impuesto_electrico") @default(5.1127) @db.Decimal(6, 4)
+  iva                 Decimal   @default(21.00) @db.Decimal(5, 2)
+  alquilerContadorDia Decimal   @map("alquiler_contador_dia") @default(0.02663) @db.Decimal(8, 5)
+  financiacionBonoSocialDia Decimal @map("financiacion_bono_social_dia") @default(0.0000) @db.Decimal(10, 5)
+  createdAt           DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+
+  @@map("annual_regulated_costs")
+}
+
+model Rate {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  comercializadora String    @db.VarChar(100)
+  nombre           String    @db.VarChar(100)
+  potP1Punta       Decimal   @map("pot_p1_punta") @db.Decimal(10, 4)
+  potP2Valle       Decimal   @map("pot_p2_valle") @db.Decimal(10, 4)
+  energiaP1Punta   Decimal   @map("energia_p1_punta") @db.Decimal(10, 4)
+  energiaP2Llana   Decimal   @map("energia_p2_llana") @db.Decimal(10, 4)
+  energiaP3Valle   Decimal   @map("energia_p3_valle") @db.Decimal(10, 4)
+  excedentes       Decimal   @db.Decimal(10, 4)
+  cuotaMensual     Decimal?  @map("cuota_mensual") @default(0.00) @db.Decimal(10, 4)
+  extraKwp         Decimal?  @map("extra_kwp") @default(0.00) @db.Decimal(10, 4)
+  isPublic         Boolean   @map("is_public") @default(false)
+  createdAt        DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId], map: "idx_rates_user_id")
+  @@index([userId, isPublic], map: "idx_rates_visibility")
+  @@map("rates")
+}
+
+model User {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String?
+  email               String?   @unique @db.VarChar(255)
+  emailVerified       DateTime? @map("email_verified")
+  image               String?
+  passwordHash        String?   @map("password_hash") @db.VarChar(255)
+  role                user_role @default(regular)
+  bonoSocialDia       Decimal?  @map("bono_social_dia") @default(0.00000) @db.Decimal(8, 5)
+  autoconsumoEstimado Decimal?  @map("autoconsumo_estimado") @default(0.00) @db.Decimal(3, 2)
+  createdAt           DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  rates               Rate[]
+  consumptions        Consumption[]
+  accounts            Account[]
+  sessions            Session[]
+
+  @@map("users")
+}
+
+model Consumption {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  year      Int
+  month     Int
+  dias      Int       @default(30)
+  pp1       Decimal   @default(3.45) @db.Decimal(10, 2)
+  pp2       Decimal   @default(3.45) @db.Decimal(10, 2)
+  kp1       Decimal   @default(0) @db.Decimal(10, 2)
+  kp2       Decimal   @default(0) @db.Decimal(10, 2)
+  kp3       Decimal   @default(0) @db.Decimal(10, 2)
+  exc       Decimal   @default(0) @db.Decimal(10, 2)
+  createdAt DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, month])
+  @@map("consumptions")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id") @db.Uuid
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum user_role {
+  regular
+  admin
+}
