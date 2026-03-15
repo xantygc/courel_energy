@@ -7,6 +7,7 @@ dotenv.config()
 
 const connectionString = process.env.DATABASE_URL
 const pool = new Pool({ connectionString })
+// @ts-ignore
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
