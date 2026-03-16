@@ -630,7 +630,8 @@ export default function App() {
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   const renderResultados = () => {
     if (!rates.length || !costs.peajeP1 || !consumos.length) {
