@@ -718,3 +718,64 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     height: 20px;
   }
 }
+
+/* ── Forms and Inputs ──────────────────────── */
+
+/* Touch-friendly inputs with iOS zoom prevention */
+@media (max-width: 768px) {
+  input[type=number],
+  input[type=text],
+  input[type=email],
+  input[type=password],
+  select {
+    font-size: 16px; /* Must be >= 16px to prevent iOS zoom */
+    min-height: 44px; /* iOS touch target guideline */
+    padding: 10px; /* Increased from 7px 10px */
+  }
+
+  /* Labels maintain readability */
+  label {
+    font-size: 11px; /* Keep current, but ensure spacing */
+    margin-bottom: 6px; /* Increased from 4px */
+  }
+
+  /* Auth form inputs (override font-family) */
+  .auth-field input[type=email],
+  .auth-field input[type=password],
+  .auth-field input[type=text] {
+    font-size: 16px; /* Override to prevent zoom */
+  }
+}
+
+/* Button touch targets */
+@media (max-width: 600px) {
+  button,
+  .btn {
+    min-height: 44px; /* Touch-friendly */
+    padding: 10px 16px; /* Increased from 7px 14px */
+  }
+
+  .btn-sm {
+    min-height: 36px; /* Smaller buttons still touchable */
+    padding: 8px 12px; /* Increased from 4px 10px */
+  }
+
+  /* Tarifa form compact */
+  .tarifa-form {
+    padding: 1rem; /* Reduced from 1.25rem */
+  }
+}
+
+/* Full-width primary buttons on very small screens */
+@media (max-width: 480px) {
+  .btn-primary {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Auth page full-width buttons */
+  .auth-container button,
+  .auth-container .btn {
+    width: 100%;
+  }
+}
