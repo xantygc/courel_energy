@@ -267,6 +267,33 @@ export default function App() {
         </div>
       )}
 
+      <div className="card" style={{ border: "1px solid var(--red-dim)", background: "rgba(255, 0, 0, 0.02)" }}>
+        <div className="sec-head">
+          <span className="sec-title" style={{ color: "var(--red)" }}>Zona de Peligro</span>
+        </div>
+        <p style={{ fontSize: "12px", color: "var(--text3)", marginBottom: "1rem" }}>
+          Al eliminar tu cuenta, se borrarán permanentemente tus consumos y tarifas privadas. 
+          Las tarifas públicas se anonimizarán. Esta acción no se puede deshacer.
+        </p>
+        <button 
+          className="btn-sm btn-danger" 
+          onClick={async () => {
+            if (confirm("¿Estás SEGURO de que quieres eliminar tu cuenta? Esta acción es irreversible.")) {
+              if (confirm("Confirma por última vez: se borrarán todos tus datos personales.")) {
+                const res = await fetch("/api/user/delete", { method: "DELETE" });
+                if (res.ok) {
+                  signOut({ callbackUrl: "/" });
+                } else {
+                  alert("Error al eliminar la cuenta.");
+                }
+              }
+            }
+          }}
+        >
+          Eliminar cuenta permanentemente
+        </button>
+      </div>
+
       <div className="card">
         <div className="sec-head">
           <span className="sec-title">Tarifas a comparar</span>

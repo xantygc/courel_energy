@@ -35,7 +35,8 @@ export default function TermsPage() {
 
         <section style={{ marginBottom: "1.5rem" }}>
           <h2 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>4. Cancelación de Cuenta</h2>
-          <p>Puedes solicitar la eliminación de tu cuenta y todos tus datos asociados en cualquier momento.</p>
+          <p>Puedes solicitar la eliminación de tu cuenta y todos tus datos asociados en cualquier momento desde el panel de configuración.</p>
+          <p><strong>Efectos del borrado:</strong> Se eliminará permanentemente tu perfil, consumos y tarifas privadas. Sin embargo, para mantener la utilidad del simulador para el resto de la comunidad, las <strong>tarifas marcadas como públicas</strong> no se eliminarán; se anonimizarán y se asignarán a la cuenta del administrador (santiago.gonzalez.courel@gmail.com) para garantizar su mantenimiento.</p>
         </section>
 
         <div style={{ marginTop: "2rem", borderTop: "1px solid var(--border)", paddingTop: "1rem", textAlign: "center" }}>
