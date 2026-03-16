@@ -504,11 +504,43 @@ export default function App() {
     );
   };
 
-  const renderConsumos = () => (
-    <div className="page active">
-      <div className="card">
-         <div className="sec-head">
-          <span className="sec-title">Historial de Consumo</span>
+  const renderConsumos = () => {
+    // Chart data: latest 12 entries, chronologically
+    const chartData = [...consumos]
+      .sort((a, b) => (a.year * 12 + a.month) - (b.year * 12 + b.month))
+      .slice(-12);
+    
+    const maxCons = Math.max(...chartData.map(c => (+c.kp1 || 0) + (+c.kp2 || 0) + (+c.kp3 || 0)), 1);
+
+    return (
+      <div className="page active">
+        {consumos.length > 0 && (
+          <div className="card">
+            <div className="sec-head">
+               <span className="sec-title">Consumo Total por Periodo (kWh)</span>
+            </div>
+            <div className="chart-container">
+              <div className="chart-bars">
+                {chartData.map(c => {
+                  const total = (+c.kp1 || 0) + (+c.kp2 || 0) + (+c.kp3 || 0);
+                  const h = (total / maxCons) * 100;
+                  return (
+                    <div key={c.id} className="chart-bar-wrap">
+                      <div className="chart-bar" style={{ height: `${h}%` }}>
+                        <div className="chart-bar-val">{total.toFixed(0)}</div>
+                      </div>
+                      <div className="chart-label">{MESES_CORTO[c.month-1]} {c.year}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="card">
+           <div className="sec-head">
+            <span className="sec-title">Historial de Consumo</span>
           <button className="btn-primary btn-sm" onClick={() => setShowConsForm(!showConsForm)}>
             {showConsForm ? "Cancelar" : "+ Añadir Mes"}
           </button>
