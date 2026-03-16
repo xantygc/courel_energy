@@ -62,8 +62,10 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(user);
-  } catch (error) {
-    console.log("[REGISTER]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+  } catch (error: any) {
+    console.error("CRITICAL [REGISTER] ERROR:", error);
+    if (error.code) console.error("Prisma Error Code:", error.code);
+    if (error.meta) console.error("Prisma Meta:", error.meta);
+    return new NextResponse(JSON.stringify({ error: error.message || "Internal Error" }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }

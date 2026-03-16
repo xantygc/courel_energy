@@ -79,6 +79,16 @@ export default function RegisterPage() {
                 required
               />
             </div>
+            <div className="field auth-field">
+              <label>Contraseña (mín. 6 caracteres)</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
             <div className="field auth-field" style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", marginTop: "1rem" }}>
               <input
                 type="checkbox"
