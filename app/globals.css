@@ -1046,3 +1046,92 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     min-width: 32px; /* Increase slightly for readability */
   }
 }
+
+/* ── Page-Specific Adjustments ─────────────── */
+
+/* Landing page mobile */
+@media (max-width: 600px) {
+  /* Landing header compact */
+  .landing-page header {
+    padding: 1rem 1.5rem; /* Reduced from 1.5rem 3rem */
+  }
+
+  .landing-page header .btn-sm {
+    font-size: 12px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Landing hero */
+  .landing-page main {
+    padding: 2rem 1rem; /* Reduced from 4rem 2rem */
+  }
+
+  /* CTA buttons stack vertically */
+  .landing-page main > div > div:last-of-type {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .landing-page main .btn-primary,
+  .landing-page main > div > div:last-of-type .btn-sm {
+    width: 100%;
+  }
+
+  /* Feature cards */
+  .landing-page main > div:last-of-type > div {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem; /* Reduced from 2rem */
+  }
+}
+
+/* Hide text on very small screens, show icons only */
+@media (max-width: 480px) {
+  .landing-page header a:not(.nav-logo):not(.btn-primary) {
+    font-size: 0; /* Hide text */
+    padding: 0.5rem;
+  }
+
+  .landing-page header a:not(.nav-logo) svg {
+    font-size: initial; /* Keep icons visible */
+  }
+
+  /* Info box compact */
+  .landing-page main > div > div[style*="rgba(61, 255, 192"] {
+    padding: 0.5rem 1rem;
+    font-size: 12px;
+  }
+}
+
+/* Auth pages */
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 0 1rem;
+    margin-top: 2rem; /* Reduced from 4rem */
+  }
+
+  .auth-field {
+    margin-bottom: 1rem; /* Ensure spacing */
+  }
+}
+
+/* Footer */
+@media (max-width: 600px) {
+  .footer {
+    padding: 1.5rem 1rem 2rem; /* Reduced from 2.5rem 1.5rem 3rem */
+  }
+
+  .footer-hl {
+    font-size: 20px; /* Reduced from 24px */
+  }
+
+  .footer-sub {
+    font-size: 12px; /* Reduced from 13px */
+    line-height: 1.6;
+  }
+
+  .coffee-btn-lg {
+    padding: 10px 20px; /* Reduced from 12px 24px */
+    font-size: 12px; /* Reduced from 13px */
+  }
+}
