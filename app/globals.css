@@ -954,3 +954,34 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     font-size: 13px; /* Reduced from 15px */
   }
 }
+
+/* ── Typography and Spacing ────────────────── */
+
+/* Section spacing reduction */
+@media (max-width: 600px) {
+  .sec-head {
+    margin-bottom: 0.75rem; /* Reduced from 1rem */
+  }
+
+  .sec-title {
+    font-size: 11px; /* Maintain, but ensure legibility */
+    letter-spacing: 0.08em; /* Slightly reduced from 0.12em */
+  }
+
+  /* Auth page typography */
+  .auth-title {
+    font-size: 24px; /* Reduced from 28px */
+  }
+
+  .auth-subtitle {
+    font-size: 13px; /* Maintain readability */
+  }
+}
+
+/* Monospace minimum legibility */
+@media (max-width: 600px) {
+  .r,
+  td.r {
+    font-size: 12px; /* Ensure minimum 12px for numbers */
+  }
+}
