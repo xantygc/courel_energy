@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
 
 export async function DELETE() {
   try {
@@ -26,10 +25,12 @@ export async function DELETE() {
     }
 
     // 2. Transact the reassignment and deletion
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      if (admin) {
-        // Reassign public rates to admin
-        await tx.rate.updateMany({
+    const operations = [];
+
+    if (admin) {
+      // Reassign public rates to admin
+      operations.push(
+        prisma.rate.updateMany({
           where: {
             userId: userId,
             isPublic: true,
@@ -37,14 +38,18 @@ export async function DELETE() {
           data: {
             userId: admin.id,
           },
-        });
-      }
+        })
+      );
+    }
 
-      // 3. Delete the user (cascading deletes for everything else: private rates, consumptions, accounts, sessions)
-      await tx.user.delete({
+    // 3. Delete the user (cascading deletes for everything else: private rates, consumptions, accounts, sessions)
+    operations.push(
+      prisma.user.delete({
         where: { id: userId },
-      });
-    });
+      })
+    );
+
+    await prisma.$transaction(operations);
 
     return new NextResponse("Account deleted", { status: 200 });
   } catch (error) {
