@@ -779,3 +779,46 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     width: 100%;
   }
 }
+
+/* ── Grid System ───────────────────────────── */
+
+/* Single column on very small screens */
+@media (max-width: 480px) {
+  .g2, .g3, .g4, .g5 {
+    grid-template-columns: 1fr; /* Force single column */
+    gap: 8px; /* Reduced from 12px */
+  }
+}
+
+/* Two columns for medium grids */
+@media (min-width: 481px) and (max-width: 600px) {
+  .g3, .g4, .g5 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 601px) and (max-width: 768px) {
+  .g4, .g5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .g3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Month grid specific (already has 600px breakpoint, enhance it) */
+@media (max-width: 375px) {
+  .month-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for tiny screens */
+    gap: 4px;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 600px) {
+  .month-grid {
+    grid-template-columns: repeat(3, 1fr); /* Current behavior maintained */
+  }
+}
