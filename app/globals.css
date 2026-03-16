@@ -637,3 +637,54 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     padding: 1rem; /* Reduced from 2rem 1.5rem */
   }
 }
+
+/* ── Navigation ────────────────────────────── */
+
+/* Reduce navigation padding on mobile */
+@media (max-width: 600px) {
+  .nav {
+    padding: 0 1rem; /* Reduced from 0 2rem */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+  }
+
+  .nav-logo {
+    font-size: 16px; /* Reduced from 20px */
+    padding: 0.75rem 1rem 0.75rem 0; /* More compact */
+    margin-right: 1rem; /* Reduced from 1.5rem */
+  }
+
+  .nav-logo svg {
+    width: 18px; /* Reduced from 22px */
+    height: 18px;
+  }
+
+  .tab-btn {
+    padding: 0.75rem 1rem; /* Reduced from 1rem 1.25rem */
+    font-size: 13px; /* Reduced from 15px */
+    white-space: nowrap;
+  }
+
+  .tab-btn-sm {
+    padding: 4px 0; /* Reduced from 6px */
+    font-size: 12px; /* Reduced from 13px */
+  }
+}
+
+/* Extra small screens - hide logo text, show only icon */
+@media (max-width: 400px) {
+  .nav-logo {
+    font-size: 0; /* Hide text */
+  }
+
+  .nav-logo svg {
+    font-size: initial; /* Keep icon visible */
+    width: 20px;
+    height: 20px;
+  }
+}
