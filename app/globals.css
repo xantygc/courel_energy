@@ -985,3 +985,64 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     font-size: 12px; /* Ensure minimum 12px for numbers */
   }
 }
+
+/* ── Charts and Visualizations ─────────────── */
+
+/* Consumption chart compact */
+@media (max-width: 600px) {
+  .chart-container {
+    padding: 0.75rem 0; /* Reduced from 1rem 0 */
+  }
+
+  .chart-bars {
+    height: 180px; /* Reduced from 220px */
+    padding-left: 36px; /* Reduced from 52px for Y-axis */
+    padding-bottom: 2rem; /* Reduced from 2.5rem */
+    gap: 8px; /* Reduced from 12px */
+  }
+
+  .chart-bar-wrap {
+    min-width: 24px; /* Reduced from 40px */
+    max-width: 32px; /* Reduced from 60px */
+    gap: 6px; /* Reduced from 8px */
+  }
+
+  /* Y-axis compact */
+  .chart-y-axis {
+    width: 32px; /* Reduced from 48px */
+  }
+
+  .chart-y-label {
+    font-size: 8px; /* Reduced from 9px */
+    right: 6px; /* Adjusted from 8px */
+  }
+
+  .chart-y-tick {
+    width: 4px; /* Reduced from 5px */
+  }
+
+  /* Month labels */
+  .chart-label {
+    font-size: 9px; /* Reduced from 10px */
+    transform: rotate(-20deg); /* Increased from -15deg for better fit */
+  }
+
+  /* Values always visible on mobile (no hover needed) */
+  .chart-bar-val {
+    font-size: 9px; /* Reduced from 10px */
+    opacity: 1; /* Always show */
+  }
+}
+
+/* Alternative: Enable horizontal scroll if bars too cramped */
+@media (max-width: 400px) {
+  .chart-bars {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 3rem; /* Extra space for scrollbar */
+  }
+
+  .chart-bar-wrap {
+    min-width: 32px; /* Increase slightly for readability */
+  }
+}
