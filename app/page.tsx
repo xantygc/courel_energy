@@ -148,6 +148,9 @@ export default function LandingPage() {
           </a>
 
           <div style={{ marginTop: "2rem", paddingTop: "2rem", textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem", alignItems: "center" }}>
+            <Link href="/terms" style={{ fontSize: "12px", color: "var(--text3)", textDecoration: "underline" }}>
+              Términos y Condiciones
+            </Link>
             <Link href="/faq#disclaimer" style={{ fontSize: "12px", color: "var(--text3)", textDecoration: "underline" }}>
               Aviso Legal y Descargo de Responsabilidad
             </Link>

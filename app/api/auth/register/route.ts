@@ -24,6 +24,8 @@ export async function POST(req: Request) {
       data: {
         email,
         passwordHash: hashedPassword,
+        termsAccepted: true,
+        termsAcceptedAt: new Date(),
         // Users default to regular
         role: "regular",
       },

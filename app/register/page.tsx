@@ -79,15 +79,16 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            <div className="field auth-field">
-              <label>Contraseña (mín. 6 caracteres)</label>
+            <div className="field auth-field" style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", marginTop: "1rem" }}>
               <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="checkbox"
+                id="terms"
                 required
-                minLength={6}
+                style={{ width: "auto", marginTop: "3px" }}
               />
+              <label htmlFor="terms" style={{ fontSize: "12px", color: "var(--text2)", cursor: "pointer", fontWeight: "normal" }}>
+                Acepto los <Link href="/terms" target="_blank" style={{ color: "var(--accent)", textDecoration: "underline" }}>Términos y Condiciones</Link> y consiento el uso de mi email para recibir actualizaciones de CourelEnergy.
+              </label>
             </div>
             <button disabled={loading} type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: "1rem" }}>
               {loading ? "Registrando..." : "Crear cuenta"}

@@ -139,7 +139,10 @@ export default function FaqPage() {
             Invítame a un café en buymeacoffee.com/courel
           </a>
  
-          <div style={{ marginTop: "2rem", paddingTop: "2rem", textAlign: "center" }}>
+          <div style={{ marginTop: "2rem", paddingTop: "2rem", textAlign: "center", display: "flex", flexDirection: "column", gap: "1rem", alignItems: "center" }}>
+            <Link href="/terms" style={{ fontSize: "12px", color: "var(--text3)", textDecoration: "underline" }}>
+              Términos y Condiciones
+            </Link>
             <a
               href="https://github.com/xantygc/courel_energy"
               target="_blank"
