@@ -820,10 +820,6 @@ export default function App() {
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "1rem" }}>
           <span style={{ color: "var(--text2)", fontSize: 13 }}>{session.user?.email} {isAdmin && <span style={{ background: "var(--accent)", color: "var(--bg)", padding: "2px 6px", borderRadius: 4, fontWeight: "bold", fontSize: 11, marginLeft: 4 }}>ADMIN</span>}</span>
-          <a className="coffee-btn-nav" href="https://buymeacoffee.com/courel" target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" /></svg>
-            Invítame a un café
-          </a>
           <button className="btn-sm" onClick={() => signOut()}>Salir</button>
         </div>
       </div>
