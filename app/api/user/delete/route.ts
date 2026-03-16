@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 
 export async function DELETE() {
   try {
@@ -25,7 +26,7 @@ export async function DELETE() {
     }
 
     // 2. Transact the reassignment and deletion
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       if (admin) {
         // Reassign public rates to admin
         await tx.rate.updateMany({
