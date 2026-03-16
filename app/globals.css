@@ -881,3 +881,76 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     min-height: 44px;
   }
 }
+
+/* ── Cards and Result Grid ─────────────────── */
+
+/* Compact cards */
+@media (max-width: 600px) {
+  .card {
+    padding: 1rem; /* Reduced from 1.5rem */
+    margin-bottom: 1rem; /* Reduced from 1.25rem */
+  }
+
+  .card-sm {
+    padding: 0.75rem; /* Reduced from 1rem */
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    padding: 1rem; /* Reduced from 1.5rem */
+  }
+
+  /* Invoice display */
+  .inv {
+    padding: 1rem; /* Reduced from 1.25rem */
+  }
+
+  .inv-row {
+    font-size: 12px; /* Reduced from 13px */
+  }
+
+  .inv-total .val {
+    font-size: 18px; /* Reduced from 20px */
+  }
+}
+
+/* Result cards grid adaptation */
+@media (max-width: 480px) {
+  .res-grid {
+    grid-template-columns: 1fr; /* Single column */
+    gap: 10px; /* Reduced from 12px */
+  }
+
+  .res-card .nom {
+    white-space: normal; /* Allow text wrap */
+    overflow: visible;
+    text-overflow: clip;
+    max-height: 2.8em; /* Approx 2 lines */
+    line-height: 1.4;
+  }
+
+  .res-card .price {
+    font-size: 20px; /* Reduced from 22px */
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .res-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 fixed columns */
+  }
+}
+
+/* Chips compact */
+@media (max-width: 600px) {
+  .chips {
+    gap: 6px; /* Reduced from 8px */
+  }
+
+  .chip {
+    padding: 6px 10px; /* Reduced from 8px 12px */
+  }
+
+  .chip .cv {
+    font-size: 13px; /* Reduced from 15px */
+  }
+}
