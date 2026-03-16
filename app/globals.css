@@ -647,10 +647,38 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Hide scrollbar Firefox */
+    position: relative; /* For focus indicators */
   }
 
   .nav::-webkit-scrollbar {
     display: none; /* Hide scrollbar Chrome/Safari */
+  }
+
+  /* Keyboard navigation accessibility - show scroll hints */
+  .nav:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .nav:focus-within::before,
+  .nav:focus-within::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .nav:focus-within::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--border2), transparent);
+  }
+
+  .nav:focus-within::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--border2), transparent);
   }
 
   .nav-logo {
@@ -679,7 +707,9 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
 /* Extra small screens - hide logo text, show only icon */
 @media (max-width: 400px) {
   .nav-logo {
-    font-size: 0; /* Hide text */
+    /* Screen-reader friendly text hiding (not font-size: 0) */
+    font-size: 1px;
+    color: transparent;
   }
 
   .nav-logo svg {
