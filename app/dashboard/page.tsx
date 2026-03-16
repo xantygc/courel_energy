@@ -24,7 +24,9 @@ export default function App() {
   const router = useRouter();
 
   const [tab, setTab] = useState("config");
+  const [configTab, setConfigTab] = useState("cuenta");
   const [rates, setRates] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [userConfig, setUserConfig] = useState<any>({ bonoSocialDia: 0, autoconsumoEstimado: 0 });
   const [costs, setCosts] = useState<any>({});
   const [consumos, setConsumos] = useState<any[]>([]); // This will now hold database consumptions
@@ -74,6 +76,51 @@ export default function App() {
       setCosts(costsData);
       setUserConfig(configData);
       setConsumos(consData);
+      if ((configData as any).role === "admin" || (session?.user as any).role === "admin") {
+        fetchUsers();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const updateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole }),
+      });
+      if (res.ok) {
+        setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteUser = async (userId: string, email: string) => {
+    if (!confirm(`¿Estás SEGURO de que quieres eliminar al usuario ${email}? Esta acción es irreversible.`)) return;
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+      if (res.ok) {
+        setUsers(users.filter(u => u.id !== userId));
+      } else {
+        const txt = await res.text();
+        alert(txt || "Error al eliminar usuario");
+      }
     } catch (e) {
       console.error(e);
     }
@@ -220,166 +267,242 @@ export default function App() {
   if (status === "loading" || !session) return null;
 
   // -- RENDERING --
-  const renderConfig = () => (
-    <div className="page active">
-      <div className="card">
-        <div className="sec-head">
-          <span className="sec-title">Parámetros del suministro (Pers. {session.user?.email})</span>
-          <button className="btn-primary btn-sm" onClick={saveUserConfig} disabled={loadingConfig}>
-            {loadingConfig ? "Guardando..." : "Guardar"}
-          </button>
-        </div>
-        <div className="g5">
-          <div className="field">
-            <label>Bono Social (€/día)</label>
-            <input type="number" step="0.00001" value={userConfig.bonoSocialDia} 
-                   onChange={e => setUserConfig({...userConfig, bonoSocialDia: e.target.value})} />
-          </div>
-          <div className="field">
-            <label>Autoconsumo est. (0-1)</label>
-            <input type="number" step="0.01" min="0" max="1" value={userConfig.autoconsumoEstimado} 
-                   onChange={e => setUserConfig({...userConfig, autoconsumoEstimado: e.target.value})} />
-          </div>
-        </div>
-      </div>
+  const renderConfig = () => {
+    const isAdmin = (session?.user as any)?.role === "admin";
 
-      {isAdmin && (
-        <div className="card">
-          <div className="sec-head">
-            <span className="sec-title">Costes Regulados BOE (Global - Solo Admin)</span>
-            <button className="btn-primary btn-sm" onClick={saveCosts} disabled={loadingConfig}>
-              {loadingConfig ? "Guardando..." : "Guardar Costes"}
-            </button>
-          </div>
-          <div className="g5" style={{ marginBottom: "1rem" }}>
-            <div className="field"><label>Peaje P1 (c€/kWh)</label><input type="number" step="0.0001" value={costs.peajeP1 ?? 0} onChange={e => setCosts({...costs, peajeP1: e.target.value})} /></div>
-            <div className="field"><label>Peaje P2 (c€/kWh)</label><input type="number" step="0.0001" value={costs.peajeP2 ?? 0} onChange={e => setCosts({...costs, peajeP2: e.target.value})} /></div>
-            <div className="field"><label>Peaje P3 (c€/kWh)</label><input type="number" step="0.0001" value={costs.peajeP3 ?? 0} onChange={e => setCosts({...costs, peajeP3: e.target.value})} /></div>
-            <div className="field"><label>Pot BOE P1 (€/kW·año)</label><input type="number" step="0.00001" value={costs.potBoeP1 ?? 0} onChange={e => setCosts({...costs, potBoeP1: e.target.value})} /></div>
-            <div className="field"><label>Pot BOE P2 (€/kW·año)</label><input type="number" step="0.00001" value={costs.potBoeP2 ?? 0} onChange={e => setCosts({...costs, potBoeP2: e.target.value})} /></div>
-          </div>
-          <div className="g5">
-            <div className="field"><label>Imp. Eléc. (%)</label><input type="number" step="0.0001" value={costs.impuestoElectrico ?? 0} onChange={e => setCosts({...costs, impuestoElectrico: e.target.value})} /></div>
-            <div className="field"><label>IVA (%)</label><input type="number" step="0.01" value={costs.iva ?? 0} onChange={e => setCosts({...costs, iva: e.target.value})} /></div>
-            <div className="field"><label>Alquiler cto. (€/día)</label><input type="number" step="0.00001" value={costs.alquilerContadorDia ?? 0} onChange={e => setCosts({...costs, alquilerContadorDia: e.target.value})} /></div>
-            <div className="field"><label>Financ. Bono Soc. (€/día)</label><input type="number" step="0.000001" value={costs.financiacionBonoSocialDia ?? 0} onChange={e => setCosts({...costs, financiacionBonoSocialDia: e.target.value})} /></div>
-          </div>
-        </div>
-      )}
-
-      <div className="card" style={{ border: "1px solid var(--red-dim)", background: "rgba(255, 0, 0, 0.02)" }}>
-        <div className="sec-head">
-          <span className="sec-title" style={{ color: "var(--red)" }}>Zona de Peligro</span>
-        </div>
-        <p style={{ fontSize: "12px", color: "var(--text3)", marginBottom: "1rem" }}>
-          Al eliminar tu cuenta, se borrarán permanentemente tus consumos y tarifas privadas. 
-          Las tarifas públicas se anonimizarán. Esta acción no se puede deshacer.
-        </p>
-        <button 
-          className="btn-sm btn-danger" 
-          onClick={async () => {
-            if (confirm("¿Estás SEGURO de que quieres eliminar tu cuenta? Esta acción es irreversible.")) {
-              if (confirm("Confirma por última vez: se borrarán todos tus datos personales.")) {
-                const res = await fetch("/api/user/delete", { method: "DELETE" });
-                if (res.ok) {
-                  signOut({ callbackUrl: "/" });
-                } else {
-                  alert("Error al eliminar la cuenta.");
-                }
-              }
-            }
-          }}
-        >
-          Eliminar cuenta permanentemente
-        </button>
-      </div>
-
-      <div className="card">
-        <div className="sec-head">
-          <span className="sec-title">Tarifas a comparar</span>
-          <button className="btn-primary btn-sm" onClick={() => openForm(-1)}>+ Añadir tarifa</button>
-        </div>
-
-        {showForm && (
-          <div className="tarifa-form">
-            <div style={{fontFamily:"var(--font-head)",fontSize:13,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",color:"var(--text2)",marginBottom:14}}>
-              {editingIndex === -1 ? 'Nueva tarifa' : 'Editar tarifa'}
-            </div>
-            <form onSubmit={saveRate}>
-              <div className="g2" style={{marginBottom:10}}>
-                <div className="field"><label>Comercializadora</label><input type="text" value={formData.comercializadora} onChange={e=>setFormData({...formData, comercializadora: e.target.value})} required/></div>
-                <div className="field"><label>Nombre tarifa</label><input type="text" value={formData.nombre} onChange={e=>setFormData({...formData, nombre: e.target.value})} required/></div>
-              </div>
-              <div className="g4" style={{marginBottom:10}}>
-                <div className="field"><label>Pot P1 punta (€/kW·año)</label><input type="number" step="0.0001" value={formData.potP1Punta} onChange={e=>setFormData({...formData, potP1Punta: e.target.value})} required/></div>
-                <div className="field"><label>Pot P2 valle (€/kW·año)</label><input type="number" step="0.0001" value={formData.potP2Valle} onChange={e=>setFormData({...formData, potP2Valle: e.target.value})} required/></div>
-                <div className="field"><label>Energía P1 punta (c€/kWh)</label><input type="number" step="0.0001" value={formData.energiaP1Punta} onChange={e=>setFormData({...formData, energiaP1Punta: e.target.value})} required/></div>
-                <div className="field"><label>Energía P2 llana (c€/kWh)</label><input type="number" step="0.0001" value={formData.energiaP2Llana} onChange={e=>setFormData({...formData, energiaP2Llana: e.target.value})} required/></div>
-              </div>
-              <div className="g4" style={{marginBottom:14}}>
-                <div className="field"><label>Energía P3 valle (c€/kWh)</label><input type="number" step="0.0001" value={formData.energiaP3Valle} onChange={e=>setFormData({...formData, energiaP3Valle: e.target.value})} required/></div>
-                <div className="field"><label>Excedentes (c€/kWh)</label><input type="number" step="0.0001" value={formData.excedentes} onChange={e=>setFormData({...formData, excedentes: e.target.value})} required/></div>
-                <div className="field"><label>Cuota mensual (€/mes)</label><input type="number" step="0.01" value={formData.cuotaMensual} onChange={e=>setFormData({...formData, cuotaMensual: e.target.value})}/></div>
-                {isAdmin && (
-                  <div className="field" style={{display:"flex", alignItems:"center", gap:"8px", marginTop:"14px"}}>
-                    <input type="checkbox" checked={formData.isPublic} onChange={e=>setFormData({...formData, isPublic: e.target.checked})} style={{width:"auto",margin:0}}/>
-                    <label style={{margin:0}}>Pública (Visible para todos)</label>
-                  </div>
-                )}
-              </div>
-              <div style={{display:"flex",gap:8}}>
-                <button type="submit" className="btn-primary btn-sm">Guardar</button>
-                <button type="button" className="btn-sm" onClick={() => setShowForm(false)}>Cancelar</button>
-              </div>
-            </form>
+    return (
+      <div className="page active">
+        {isAdmin && (
+          <div className="sec-tabs" style={{marginBottom: "1.5rem", display: "flex", gap: "1rem", borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem"}}>
+            <button className={`tab-btn-sm ${configTab === 'cuenta' ? 'active' : ''}`} onClick={() => setConfigTab('cuenta')}>Mi Cuenta</button>
+            <button className={`tab-btn-sm ${configTab === 'usuarios' ? 'active' : ''}`} onClick={() => setConfigTab('usuarios')}>Usuarios</button>
+            <button className={`tab-btn-sm ${configTab === 'boe' ? 'active' : ''}`} onClick={() => setConfigTab('boe')}>Costes BOE</button>
+            <button className={`tab-btn-sm ${configTab === 'tarifas' ? 'active' : ''}`} onClick={() => setConfigTab('tarifas')}>Tarifas Públicas</button>
           </div>
         )}
 
-        <div className="tbl-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style={{textAlign:"left"}}>Comercializadora</th>
-                <th style={{textAlign:"left"}}>Tarifa</th>
-                <th>Pot P1</th>
-                <th>Pot P2</th>
-                <th>E P1</th>
-                <th>E P2</th>
-                <th>E P3</th>
-                <th>Exc</th>
-                <th>Pública</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rates.length === 0 && <tr><td colSpan={10} style={{textAlign:"center", color:"var(--text3)", padding:"2rem"}}>Sin tarifas. Añade una tarifa para comenzar.</td></tr>}
-              {rates.map((t, i) => (
-                <tr key={t.id}>
-                  <td>{t.comercializadora}</td>
-                  <td>{t.nombre}</td>
-                  <td className="r">{(+t.potP1Punta).toFixed(2)}</td>
-                  <td className="r">{(+t.potP2Valle).toFixed(2)}</td>
-                  <td className="r">{(+t.energiaP1Punta).toFixed(2)}</td>
-                  <td className="r">{(+t.energiaP2Llana).toFixed(2)}</td>
-                  <td className="r">{(+t.energiaP3Valle).toFixed(2)}</td>
-                  <td className="r">{(+t.excedentes).toFixed(2)}</td>
-                  <td className="r">{t.isPublic ? "Sí" : "No"}</td>
-                  <td style={{textAlign:"right",whiteSpace:"nowrap"}}>
-                    {(t.userId === userId || isAdmin) && (
-                      <>
-                        <button className="btn-sm" onClick={() => openForm(i)} style={{marginRight:4}}>Editar</button>
-                        <button className="btn-sm btn-danger" onClick={() => deleteRate(i)}>✕</button>
-                      </>
+        {(!isAdmin || configTab === 'cuenta') && (
+          <>
+            <div className="card">
+              <div className="sec-head">
+                <span className="sec-title">Parámetros del suministro ({session.user?.email})</span>
+                <button className="btn-primary btn-sm" onClick={saveUserConfig} disabled={loadingConfig}>
+                  {loadingConfig ? "Guardando..." : "Guardar"}
+                </button>
+              </div>
+              <div className="g5">
+                <div className="field">
+                  <label>Bono Social (€/día)</label>
+                  <input type="number" step="0.00001" value={userConfig.bonoSocialDia} 
+                         onChange={e => setUserConfig({...userConfig, bonoSocialDia: e.target.value})} />
+                </div>
+                <div className="field">
+                  <label>Autoconsumo est. (0-1)</label>
+                  <input type="number" step="0.01" min="0" max="1" value={userConfig.autoconsumoEstimado} 
+                         onChange={e => setUserConfig({...userConfig, autoconsumoEstimado: e.target.value})} />
+                </div>
+              </div>
+            </div>
+
+            <div className="card" style={{ border: "1px solid var(--red-dim)", background: "rgba(255, 0, 0, 0.02)" }}>
+              <div className="sec-head">
+                <span className="sec-title" style={{ color: "var(--red)" }}>Zona de Peligro</span>
+              </div>
+              <p style={{ fontSize: "12px", color: "var(--text3)", marginBottom: "1rem" }}>
+                Al eliminar tu cuenta, se borrarán permanentemente tus consumos y tarifas privadas. 
+                Las tarifas públicas se anonimizarán. Esta acción no se puede deshacer.
+              </p>
+              <button 
+                className="btn-sm btn-danger" 
+                onClick={async () => {
+                  if (confirm("¿Estás SEGURO de que quieres eliminar tu cuenta? Esta acción es irreversible.")) {
+                    if (confirm("Confirma por última vez: se borrarán todos tus datos personales.")) {
+                      const res = await fetch("/api/user/delete", { method: "DELETE" });
+                      if (res.ok) {
+                        signOut({ callbackUrl: "/" });
+                      } else {
+                        alert("Error al eliminar la cuenta.");
+                      }
+                    }
+                  }
+                }}
+              >
+                Eliminar cuenta permanentemente
+              </button>
+            </div>
+          </>
+        )}
+
+        {isAdmin && configTab === 'usuarios' && (
+          <div className="card">
+            <div className="sec-head">
+              <span className="sec-title">Gestión de Usuarios</span>
+            </div>
+            <div className="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{textAlign:"left"}}>Email</th>
+                    <th style={{textAlign:"left"}}>Nombre</th>
+                    <th>Rol</th>
+                    <th>Registro</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(u => (
+                    <tr key={u.id}>
+                      <td>{u.email}</td>
+                      <td>{u.name || "-"}</td>
+                      <td className="r">
+                        <select 
+                          value={u.role} 
+                          onChange={(e) => updateUserRole(u.id, e.target.value)}
+                          style={{fontSize: "12px", padding: "2px 4px"}}
+                          disabled={u.email === "santiago.gonzalez.courel@gmail.com"}
+                        >
+                          <option value="regular">Regular</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </td>
+                      <td className="r" style={{fontSize: "11px", color: "var(--text3)"}}>
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </td>
+                      <td style={{textAlign:"right"}}>
+                        {u.email !== "santiago.gonzalez.courel@gmail.com" && (
+                          <button className="btn-sm btn-danger" onClick={() => deleteUser(u.id, u.email)}>✕</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {isAdmin && configTab === 'boe' && (
+          <div className="card">
+            <div className="sec-head">
+              <span className="sec-title">Costes Regulados BOE (Global)</span>
+              <button className="btn-primary btn-sm" onClick={saveCosts} disabled={loadingConfig}>
+                {loadingConfig ? "Guardando..." : "Guardar Costes"}
+              </button>
+            </div>
+            <div className="g5" style={{ marginBottom: "1rem" }}>
+              <div className="field"><label>Peaje P1 (c€/kWh)</label><input type="number" step="0.0001" value={costs.peajeP1 ?? 0} onChange={e => setCosts({...costs, peajeP1: e.target.value})} /></div>
+              <div className="field"><label>Peaje P2 (c€/kWh)</label><input type="number" step="0.0001" value={costs.peajeP2 ?? 0} onChange={e => setCosts({...costs, peajeP2: e.target.value})} /></div>
+              <div className="field"><label>Peaje P3 (c€/kWh)</label><input type="number" step="0.0001" value={costs.peajeP3 ?? 0} onChange={e => setCosts({...costs, peajeP3: e.target.value})} /></div>
+              <div className="field"><label>Pot BOE P1 (€/kW·año)</label><input type="number" step="0.00001" value={costs.potBoeP1 ?? 0} onChange={e => setCosts({...costs, potBoeP1: e.target.value})} /></div>
+              <div className="field"><label>Pot BOE P2 (€/kW·año)</label><input type="number" step="0.00001" value={costs.potBoeP2 ?? 0} onChange={e => setCosts({...costs, potBoeP2: e.target.value})} /></div>
+            </div>
+            <div className="g5">
+              <div className="field"><label>Imp. Eléc. (%)</label><input type="number" step="0.0001" value={costs.impuestoElectrico ?? 0} onChange={e => setCosts({...costs, impuestoElectrico: e.target.value})} /></div>
+              <div className="field"><label>IVA (%)</label><input type="number" step="0.01" value={costs.iva ?? 0} onChange={e => setCosts({...costs, iva: e.target.value})} /></div>
+              <div className="field"><label>Alquiler cto. (€/día)</label><input type="number" step="0.00001" value={costs.alquilerContadorDia ?? 0} onChange={e => setCosts({...costs, alquilerContadorDia: e.target.value})} /></div>
+              <div className="field"><label>Financ. Bono Soc. (€/día)</label><input type="number" step="0.000001" value={costs.financiacionBonoSocialDia ?? 0} onChange={e => setCosts({...costs, financiacionBonoSocialDia: e.target.value})} /></div>
+            </div>
+          </div>
+        )}
+
+        {(!isAdmin || configTab === 'tarifas' || configTab === 'cuenta') && (
+          <div className="card">
+            <div className="sec-head">
+              <span className="sec-title">
+                {configTab === 'tarifas' ? 'Tarifas Públicas' : 'Mis tarifas personalizadas'}
+              </span>
+              <button className="btn-primary btn-sm" onClick={() => openForm(-1)}>+ Añadir tarifa</button>
+            </div>
+
+            {showForm && (
+              <div className="tarifa-form">
+                <div style={{fontFamily:"var(--font-head)",fontSize:13,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",color:"var(--text2)",marginBottom:14}}>
+                  {editingIndex === -1 ? 'Nueva tarifa' : 'Editar tarifa'}
+                </div>
+                <form onSubmit={saveRate}>
+                  <div className="g2" style={{marginBottom:10}}>
+                    <div className="field"><label>Comercializadora</label><input type="text" value={formData.comercializadora} onChange={e=>setFormData({...formData, comercializadora: e.target.value})} required/></div>
+                    <div className="field"><label>Nombre tarifa</label><input type="text" value={formData.nombre} onChange={e=>setFormData({...formData, nombre: e.target.value})} required/></div>
+                  </div>
+                  <div className="g4" style={{marginBottom:10}}>
+                    <div className="field"><label>Pot P1 punta (€/kW·año)</label><input type="number" step="0.0001" value={formData.potP1Punta} onChange={e=>setFormData({...formData, potP1Punta: e.target.value})} required/></div>
+                    <div className="field"><label>Pot P2 valle (€/kW·año)</label><input type="number" step="0.0001" value={formData.potP2Valle} onChange={e=>setFormData({...formData, potP2Valle: e.target.value})} required/></div>
+                    <div className="field"><label>Energía P1 punta (c€/kWh)</label><input type="number" step="0.0001" value={formData.energiaP1Punta} onChange={e=>setFormData({...formData, energiaP1Punta: e.target.value})} required/></div>
+                    <div className="field"><label>Energía P2 llana (c€/kWh)</label><input type="number" step="0.0001" value={formData.energiaP2Llana} onChange={e=>setFormData({...formData, energiaP2Llana: e.target.value})} required/></div>
+                  </div>
+                  <div className="g4" style={{marginBottom:14}}>
+                    <div className="field"><label>Energía P3 valle (c€/kWh)</label><input type="number" step="0.0001" value={formData.energiaP3Valle} onChange={e=>setFormData({...formData, energiaP3Valle: e.target.value})} required/></div>
+                    <div className="field"><label>Excedentes (c€/kWh)</label><input type="number" step="0.0001" value={formData.excedentes} onChange={e=>setFormData({...formData, excedentes: e.target.value})} required/></div>
+                    <div className="field"><label>Cuota mensual (€/mes)</label><input type="number" step="0.01" value={formData.cuotaMensual} onChange={e=>setFormData({...formData, cuotaMensual: e.target.value})}/></div>
+                    {isAdmin && (
+                      <div className="field" style={{display:"flex", alignItems:"center", gap:"8px", marginTop:"14px"}}>
+                        <input type="checkbox" checked={formData.isPublic} onChange={e=>setFormData({...formData, isPublic: e.target.checked})} style={{width:"auto",margin:0}}/>
+                        <label style={{margin:0}}>Pública (Visible para todos)</label>
+                      </div>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                  <div style={{display:"flex",gap:8}}>
+                    <button type="submit" className="btn-primary btn-sm">Guardar</button>
+                    <button type="button" className="btn-sm" onClick={() => setShowForm(false)}>Cancelar</button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{textAlign:"left"}}>Comercializadora</th>
+                    <th style={{textAlign:"left"}}>Tarifa</th>
+                    <th>Pot P1</th>
+                    <th>Pot P2</th>
+                    <th>E P1</th>
+                    <th>E P2</th>
+                    <th>E P3</th>
+                    <th>Exc</th>
+                    {isAdmin && <th>Pública</th>}
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rates
+                    .filter(t => {
+                      if (!isAdmin) return true; // Regular sees all their available (public + own)
+                      if (configTab === 'tarifas') return t.isPublic;
+                      if (configTab === 'cuenta') return !t.isPublic;
+                      return true;
+                    })
+                    .map((t, i) => (
+                      <tr key={t.id}>
+                        <td>{t.comercializadora}</td>
+                        <td>{t.nombre}</td>
+                        <td className="r">{(+t.potP1Punta).toFixed(2)}</td>
+                        <td className="r">{(+t.potP2Valle).toFixed(2)}</td>
+                        <td className="r">{(+t.energiaP1Punta).toFixed(2)}</td>
+                        <td className="r">{(+t.energiaP2Llana).toFixed(2)}</td>
+                        <td className="r">{(+t.energiaP3Valle).toFixed(2)}</td>
+                        <td className="r">{(+t.excedentes).toFixed(2)}</td>
+                        {isAdmin && <td className="r">{t.isPublic ? "Sí" : "No"}</td>}
+                        <td style={{textAlign:"right",whiteSpace:"nowrap"}}>
+                          {(t.userId === userId || isAdmin) && (
+                            <>
+                              <button className="btn-sm" onClick={() => openForm(rates.indexOf(t))} style={{marginRight:4}}>Editar</button>
+                              <button className="btn-sm btn-danger" onClick={() => deleteRate(rates.indexOf(t))}>✕</button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  {rates.length === 0 && <tr><td colSpan={10} style={{textAlign:"center", color:"var(--text3)", padding:"2rem"}}>Sin tarifas.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderConsumos = () => (
     <div className="page active">
