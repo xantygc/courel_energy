@@ -1135,3 +1135,66 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
     font-size: 12px; /* Reduced from 13px */
   }
 }
+
+/* ── Touch Interactions and Utilities ─────── */
+
+/* Remove default tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hover effects only on hover-capable devices */
+@media (hover: hover) {
+  button:hover,
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: rgba(198, 241, 53, 0.22);
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+  }
+
+  tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+/* Touch feedback on touch devices */
+@media (hover: none) {
+  button:active,
+  .btn:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  a:active {
+    opacity: 0.7;
+  }
+}
+
+/* Empty states compact */
+@media (max-width: 600px) {
+  .empty {
+    padding: 2rem; /* Reduced from 3rem */
+  }
+
+  .empty svg {
+    width: 32px; /* Reduced from 40px */
+    height: 32px;
+  }
+}
+
+/* Scrollbar sizing */
+@media (max-width: 600px) {
+  ::-webkit-scrollbar {
+    width: 4px; /* Reduced from 6px */
+    height: 4px;
+  }
+}
+
+/* END MOBILE OPTIMIZATIONS */
