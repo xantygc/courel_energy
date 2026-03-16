@@ -612,3 +612,28 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
   background: var(--border2);
   transform: translateY(50%);
 }
+
+/* ── MOBILE OPTIMIZATIONS ────────────────────── */
+/* Added: 2026-03-16 */
+/* Design Doc: docs/plans/2026-03-16-mobile-optimization-design.md */
+
+/* Breakpoint Reference:
+   375px  - Mobile Small (iPhone SE, compact Android)
+   480px  - Mobile Standard (most smartphones)
+   600px  - Mobile Large / Phablet
+   768px  - Tablet Portrait
+   1024px - Tablet Landscape / Desktop Small
+*/
+
+/* ── Foundation ────────────────────────────── */
+
+/* Base mobile adjustments */
+@media (max-width: 768px) {
+  body {
+    line-height: 1.6; /* Increased from 1.5 for better readability */
+  }
+
+  .app {
+    padding: 1rem; /* Reduced from 2rem 1.5rem */
+  }
+}
