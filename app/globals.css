@@ -502,10 +502,11 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
 
 .chart-bars {
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  height: 200px;
-  padding-bottom: 2rem;
+  align-items: stretch;
+  gap: 12px;
+  height: 220px;
+  padding-bottom: 2.5rem;
+  padding-left: 52px; /* space for Y-axis */
   border-bottom: 1px solid var(--border);
   position: relative;
 }
@@ -514,23 +515,43 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end; /* Pushes content to bottom */
   align-items: center;
   gap: 8px;
   position: relative;
-  min-width: 30px;
+  min-width: 40px;
+  max-width: 60px; /* Prevent huge bars when only a few items exist */
 }
 
 .chart-bar {
   width: 100%;
-  background: linear-gradient(to top, var(--accent-dim), var(--accent));
   border-radius: 4px 4px 0 0;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  overflow: hidden; /* For inner parts */
+  display: flex;
+  flex-direction: column;
 }
 
+.chart-bar-inner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse; /* Stack from bottom */
+}
+
+.bar-part {
+  width: 100%;
+  transition: height 0.3s ease;
+}
+
+.bar-part.p1 { background: var(--accent); }
+.bar-part.p2 { background: var(--accent2); }
+.bar-part.p3 { background: #3dffc0; opacity: 0.6; } /* Using a variation for P3 */
+
 .chart-bar:hover {
-  filter: brightness(1.2);
-  box-shadow: 0 0 15px var(--accent-dim);
+  filter: brightness(1.1);
+  box-shadow: 0 0 10px var(--accent-dim);
 }
 
 .chart-bar-val {
@@ -563,8 +584,31 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
 
 .chart-y-axis {
   position: absolute;
-  left: -2rem;
+  left: 0;
   top: 0;
-  height: 100%;
-  border-right: 1px solid var(--border);
+  bottom: 2.5rem; /* match padding-bottom of .chart-bars */
+  width: 48px;
+  border-right: 1px solid var(--border2);
+  pointer-events: none;
+}
+
+.chart-y-label {
+  position: absolute;
+  right: 8px;
+  transform: translateY(50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text3);
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.chart-y-tick {
+  position: absolute;
+  right: 0;
+  width: 5px;
+  height: 1px;
+  background: var(--border2);
+  transform: translateY(50%);
 }
