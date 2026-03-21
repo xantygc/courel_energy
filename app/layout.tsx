@@ -13,6 +13,10 @@ export const viewport: Viewport = {
   maximumScale: 5.0,
 };
 
+import { NextStep } from 'nextstepjs';
+import { steps } from '@/lib/tutorial-steps';
+import { CustomTourCard } from '@/components/CustomTourCard';
+
 export default function RootLayout({
   children,
 }: {
@@ -22,7 +26,14 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <Provider>
-          {children}
+          <NextStep 
+            steps={steps} 
+            cardComponent={CustomTourCard}
+            shadowRgb="0,0,0"
+            shadowOpacity="0.7"
+          >
+            {children}
+          </NextStep>
         </Provider>
       </body>
     </html>
