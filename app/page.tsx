@@ -24,16 +24,6 @@ export default function LandingPage() {
           <Link href="/faq" className="btn-sm" style={{ textDecoration: "none", background: "transparent", border: "none", color: "var(--text)" }}>
             Cómo funciona
           </Link>
-          <a
-            href="https://buymeacoffee.com/courel"
-            target="_blank"
-            rel="noreferrer"
-            className="coffee-btn-nav"
-            style={{ textDecoration: "none" }}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" style={{width:14,height:14}}><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" /></svg>
-            Invítame a un café
-          </a>
           <Link href="/login" className="btn-sm" style={{ textDecoration: "none", background: "transparent", border: "1px solid var(--border)" }}>
             Iniciar Sesión
           </Link>

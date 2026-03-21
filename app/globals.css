@@ -37,6 +37,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   min-height: 100vh;
+  zoom: 1.1;
 }
 
 a {
@@ -93,6 +94,30 @@ a {
 }
 
 .tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-btn-sm {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 0;
+  border: none;
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+}
+
+.tab-btn-sm:hover {
+  color: var(--text2);
+}
+
+.tab-btn-sm.active {
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
@@ -469,3 +494,708 @@ tfoot td:first-child { text-align: left; font-family: var(--font-body); }
   height: 18px;
   flex-shrink: 0;
 }
+
+/* ── CONSUMPTION CHART ───────────────────────── */
+.chart-container {
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  height: 220px;
+  padding-bottom: 2.5rem;
+  padding-left: 52px; /* space for Y-axis */
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Pushes content to bottom */
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  min-width: 40px;
+  max-width: 60px; /* Prevent huge bars when only a few items exist */
+}
+
+.chart-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden; /* For inner parts */
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-bar-inner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse; /* Stack from bottom */
+}
+
+.bar-part {
+  width: 100%;
+  transition: height 0.3s ease;
+}
+
+.bar-part.p1 { background: var(--accent); }
+.bar-part.p2 { background: var(--accent2); }
+.bar-part.p3 { background: #3dffc0; opacity: 0.6; } /* Using a variation for P3 */
+
+.chart-bar:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 10px var(--accent-dim);
+}
+
+.chart-bar-val {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+
+.chart-bar-wrap:hover .chart-bar-val {
+  opacity: 1;
+}
+
+.chart-label {
+  font-family: var(--font-head);
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(-15deg);
+  margin-top: 4px;
+}
+
+.chart-y-axis {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 2.5rem; /* match padding-bottom of .chart-bars */
+  width: 48px;
+  border-right: 1px solid var(--border2);
+  pointer-events: none;
+}
+
+.chart-y-label {
+  position: absolute;
+  right: 8px;
+  transform: translateY(50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text3);
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.chart-y-tick {
+  position: absolute;
+  right: 0;
+  width: 5px;
+  height: 1px;
+  background: var(--border2);
+  transform: translateY(50%);
+}
+
+/* ── MOBILE OPTIMIZATIONS ────────────────────── */
+/* Added: 2026-03-16 */
+/* Design Doc: docs/plans/2026-03-16-mobile-optimization-design.md */
+
+/* Breakpoint Reference:
+   375px  - Mobile Small (iPhone SE, compact Android)
+   480px  - Mobile Standard (most smartphones)
+   600px  - Mobile Large / Phablet
+   768px  - Tablet Portrait
+   1024px - Tablet Landscape / Desktop Small
+*/
+
+/* ── Foundation ────────────────────────────── */
+
+/* Base mobile adjustments */
+@media (max-width: 768px) {
+  body {
+    line-height: 1.6; /* Increased from 1.5 for better readability */
+  }
+
+  .app {
+    padding: 1rem; /* Reduced from 2rem 1.5rem */
+  }
+}
+
+/* ── Navigation ────────────────────────────── */
+
+/* Reduce navigation padding on mobile */
+@media (max-width: 600px) {
+  .nav {
+    padding: 0 1rem; /* Reduced from 0 2rem */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    position: relative; /* For focus indicators */
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+  }
+
+  /* Keyboard navigation accessibility - show scroll hints */
+  .nav:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .nav:focus-within::before,
+  .nav:focus-within::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .nav:focus-within::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--border2), transparent);
+  }
+
+  .nav:focus-within::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--border2), transparent);
+  }
+
+  .nav-logo {
+    font-size: 16px; /* Reduced from 20px */
+    padding: 0.75rem 1rem 0.75rem 0; /* More compact */
+    margin-right: 1rem; /* Reduced from 1.5rem */
+  }
+
+  .nav-logo svg {
+    width: 18px; /* Reduced from 22px */
+    height: 18px;
+  }
+
+  .tab-btn {
+    padding: 0.75rem 1rem; /* Reduced from 1rem 1.25rem */
+    font-size: 13px; /* Reduced from 15px */
+    white-space: nowrap;
+  }
+
+  .tab-btn-sm {
+    padding: 4px 0; /* Reduced from 6px */
+    font-size: 12px; /* Reduced from 13px */
+  }
+}
+
+/* Extra small screens - hide logo text, show only icon */
+@media (max-width: 400px) {
+  .nav-logo {
+    /* Screen-reader friendly text hiding (not font-size: 0) */
+    font-size: 1px;
+    color: transparent;
+  }
+
+  .nav-logo svg {
+    font-size: initial; /* Keep icon visible */
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ── Forms and Inputs ──────────────────────── */
+
+/* Touch-friendly inputs with iOS zoom prevention */
+@media (max-width: 768px) {
+  input[type=number],
+  input[type=text],
+  input[type=email],
+  input[type=password],
+  select {
+    font-size: 16px; /* Must be >= 16px to prevent iOS zoom */
+    min-height: 44px; /* iOS touch target guideline */
+    padding: 10px; /* Increased from 7px 10px */
+  }
+
+  /* Labels maintain readability */
+  label {
+    font-size: 11px; /* Keep current, but ensure spacing */
+    margin-bottom: 6px; /* Increased from 4px */
+  }
+
+  /* Auth form inputs (override font-family) */
+  .auth-field input[type=email],
+  .auth-field input[type=password],
+  .auth-field input[type=text] {
+    font-size: 16px; /* Override to prevent zoom */
+  }
+}
+
+/* Button touch targets */
+@media (max-width: 600px) {
+  button,
+  .btn {
+    min-height: 44px; /* Touch-friendly */
+    padding: 10px 16px; /* Increased from 7px 14px */
+  }
+
+  .btn-sm {
+    min-height: 36px; /* Smaller buttons still touchable */
+    padding: 8px 12px; /* Increased from 4px 10px */
+  }
+
+  /* Tarifa form compact */
+  .tarifa-form {
+    padding: 1rem; /* Reduced from 1.25rem */
+  }
+}
+
+/* Full-width primary buttons on very small screens */
+@media (max-width: 480px) {
+  .btn-primary {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Auth page full-width buttons */
+  .auth-container button,
+  .auth-container .btn {
+    width: 100%;
+  }
+}
+
+/* ── Grid System ───────────────────────────── */
+
+/* Single column on very small screens */
+@media (max-width: 480px) {
+  .g2, .g3, .g4, .g5 {
+    grid-template-columns: 1fr; /* Force single column */
+    gap: 8px; /* Reduced from 12px */
+  }
+}
+
+/* Two columns for medium grids */
+@media (min-width: 481px) and (max-width: 600px) {
+  .g3, .g4, .g5 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 601px) and (max-width: 768px) {
+  .g4, .g5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .g3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Month grid specific (already has 600px breakpoint, enhance it) */
+@media (max-width: 375px) {
+  .month-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for tiny screens */
+    gap: 4px;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 600px) {
+  .month-grid {
+    grid-template-columns: repeat(3, 1fr); /* Current behavior maintained */
+  }
+}
+
+/* ── Tables ────────────────────────────────── */
+
+/* Horizontal scroll with visual indicators */
+@media (max-width: 768px) {
+  .tbl-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    position: relative;
+
+    /* Gradient shadows for scroll feedback */
+    background:
+      linear-gradient(90deg, var(--bg2) 30%, transparent),
+      linear-gradient(90deg, transparent, var(--bg2) 70%) 100% 0,
+      linear-gradient(90deg, rgba(255,255,255,0.1), transparent 30%),
+      linear-gradient(270deg, rgba(255,255,255,0.1), transparent 30%) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* Sticky first column */
+  table th:first-child,
+  table td:first-child {
+    position: sticky;
+    left: 0;
+    background: var(--bg2);
+    z-index: 1;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+  }
+
+  /* Reduce table typography */
+  table {
+    font-size: 12px; /* Reduced from 13px */
+  }
+
+  th {
+    font-size: 10px; /* Reduced from 11px */
+    padding: 6px 8px; /* Reduced from 8px 10px */
+  }
+
+  td {
+    padding: 6px 8px;
+  }
+
+  /* Table inputs prevent zoom */
+  td input {
+    font-size: 14px; /* Prevent iOS zoom */
+    padding: 6px;
+    min-height: 36px; /* Touch-friendly but compact */
+  }
+
+  /* Interactive rows touch-friendly */
+  tbody tr {
+    min-height: 44px;
+  }
+}
+
+/* ── Cards and Result Grid ─────────────────── */
+
+/* Compact cards */
+@media (max-width: 600px) {
+  .card {
+    padding: 1rem; /* Reduced from 1.5rem */
+    margin-bottom: 1rem; /* Reduced from 1.25rem */
+  }
+
+  .card-sm {
+    padding: 0.75rem; /* Reduced from 1rem */
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    padding: 1rem; /* Reduced from 1.5rem */
+  }
+
+  /* Invoice display */
+  .inv {
+    padding: 1rem; /* Reduced from 1.25rem */
+  }
+
+  .inv-row {
+    font-size: 12px; /* Reduced from 13px */
+  }
+
+  .inv-total .val {
+    font-size: 18px; /* Reduced from 20px */
+  }
+}
+
+/* Result cards grid adaptation */
+@media (max-width: 480px) {
+  .res-grid {
+    grid-template-columns: 1fr; /* Single column */
+    gap: 10px; /* Reduced from 12px */
+  }
+
+  .res-card .nom {
+    white-space: normal; /* Allow text wrap */
+    overflow: visible;
+    text-overflow: clip;
+    max-height: 2.8em; /* Approx 2 lines */
+    line-height: 1.4;
+  }
+
+  .res-card .price {
+    font-size: 20px; /* Reduced from 22px */
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .res-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 fixed columns */
+  }
+}
+
+/* Chips compact */
+@media (max-width: 600px) {
+  .chips {
+    gap: 6px; /* Reduced from 8px */
+  }
+
+  .chip {
+    padding: 6px 10px; /* Reduced from 8px 12px */
+  }
+
+  .chip .cv {
+    font-size: 13px; /* Reduced from 15px */
+  }
+}
+
+/* ── Typography and Spacing ────────────────── */
+
+/* Section spacing reduction */
+@media (max-width: 600px) {
+  .sec-head {
+    margin-bottom: 0.75rem; /* Reduced from 1rem */
+  }
+
+  .sec-title {
+    font-size: 11px; /* Maintain, but ensure legibility */
+    letter-spacing: 0.08em; /* Slightly reduced from 0.12em */
+  }
+
+  /* Auth page typography */
+  .auth-title {
+    font-size: 24px; /* Reduced from 28px */
+  }
+
+  .auth-subtitle {
+    font-size: 13px; /* Maintain readability */
+  }
+}
+
+/* Monospace minimum legibility */
+@media (max-width: 600px) {
+  .r,
+  td.r {
+    font-size: 12px; /* Ensure minimum 12px for numbers */
+  }
+}
+
+/* ── Charts and Visualizations ─────────────── */
+
+/* Consumption chart compact */
+@media (max-width: 600px) {
+  .chart-container {
+    padding: 0.75rem 0; /* Reduced from 1rem 0 */
+  }
+
+  .chart-bars {
+    height: 180px; /* Reduced from 220px */
+    padding-left: 36px; /* Reduced from 52px for Y-axis */
+    padding-bottom: 2rem; /* Reduced from 2.5rem */
+    gap: 8px; /* Reduced from 12px */
+  }
+
+  .chart-bar-wrap {
+    min-width: 24px; /* Reduced from 40px */
+    max-width: 32px; /* Reduced from 60px */
+    gap: 6px; /* Reduced from 8px */
+  }
+
+  /* Y-axis compact */
+  .chart-y-axis {
+    width: 32px; /* Reduced from 48px */
+  }
+
+  .chart-y-label {
+    font-size: 8px; /* Reduced from 9px */
+    right: 6px; /* Adjusted from 8px */
+  }
+
+  .chart-y-tick {
+    width: 4px; /* Reduced from 5px */
+  }
+
+  /* Month labels */
+  .chart-label {
+    font-size: 9px; /* Reduced from 10px */
+    transform: rotate(-20deg); /* Increased from -15deg for better fit */
+  }
+
+  /* Values always visible on mobile (no hover needed) */
+  .chart-bar-val {
+    font-size: 9px; /* Reduced from 10px */
+    opacity: 1; /* Always show */
+  }
+}
+
+/* Alternative: Enable horizontal scroll if bars too cramped */
+@media (max-width: 400px) {
+  .chart-bars {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 3rem; /* Extra space for scrollbar */
+  }
+
+  .chart-bar-wrap {
+    min-width: 32px; /* Increase slightly for readability */
+  }
+}
+
+/* ── Page-Specific Adjustments ─────────────── */
+
+/* Landing page mobile */
+@media (max-width: 600px) {
+  /* Landing header compact */
+  .landing-page header {
+    padding: 1rem 1.5rem; /* Reduced from 1.5rem 3rem */
+  }
+
+  .landing-page header .btn-sm {
+    font-size: 12px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Landing hero */
+  .landing-page main {
+    padding: 2rem 1rem; /* Reduced from 4rem 2rem */
+  }
+
+  /* CTA buttons stack vertically */
+  .landing-page main > div > div:last-of-type {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .landing-page main .btn-primary,
+  .landing-page main > div > div:last-of-type .btn-sm {
+    width: 100%;
+  }
+
+  /* Feature cards */
+  .landing-page main > div:last-of-type > div {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem; /* Reduced from 2rem */
+  }
+}
+
+/* Hide text on very small screens, show icons only */
+@media (max-width: 480px) {
+  .landing-page header a:not(.nav-logo):not(.btn-primary) {
+    font-size: 0; /* Hide text */
+    padding: 0.5rem;
+  }
+
+  .landing-page header a:not(.nav-logo) svg {
+    font-size: initial; /* Keep icons visible */
+  }
+
+  /* Info box compact */
+  .landing-page main > div > div[style*="rgba(61, 255, 192"] {
+    padding: 0.5rem 1rem;
+    font-size: 12px;
+  }
+}
+
+/* Auth pages */
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 0 1rem;
+    margin-top: 2rem; /* Reduced from 4rem */
+  }
+
+  .auth-field {
+    margin-bottom: 1rem; /* Ensure spacing */
+  }
+}
+
+/* Footer */
+@media (max-width: 600px) {
+  .footer {
+    padding: 1.5rem 1rem 2rem; /* Reduced from 2.5rem 1.5rem 3rem */
+  }
+
+  .footer-hl {
+    font-size: 20px; /* Reduced from 24px */
+  }
+
+  .footer-sub {
+    font-size: 12px; /* Reduced from 13px */
+    line-height: 1.6;
+  }
+
+  .coffee-btn-lg {
+    padding: 10px 20px; /* Reduced from 12px 24px */
+    font-size: 12px; /* Reduced from 13px */
+  }
+}
+
+/* ── Touch Interactions and Utilities ─────── */
+
+/* Remove default tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hover effects only on hover-capable devices */
+@media (hover: hover) {
+  button:hover,
+  .btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-primary:hover {
+    background: rgba(198, 241, 53, 0.22);
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+  }
+
+  tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+/* Touch feedback on touch devices */
+@media (hover: none) {
+  button:active,
+  .btn:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  a:active {
+    opacity: 0.7;
+  }
+}
+
+/* Empty states compact */
+@media (max-width: 600px) {
+  .empty {
+    padding: 2rem; /* Reduced from 3rem */
+  }
+
+  .empty svg {
+    width: 32px; /* Reduced from 40px */
+    height: 32px;
+  }
+}
+
+/* Scrollbar sizing */
+@media (max-width: 600px) {
+  ::-webkit-scrollbar {
+    width: 4px; /* Reduced from 6px */
+    height: 4px;
+  }
+}
+
+/* END MOBILE OPTIMIZATIONS */
