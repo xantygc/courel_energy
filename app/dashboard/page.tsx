@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useNextStep } from "nextstepjs";
 import { simularAnual } from "@/lib/calculator";
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
@@ -22,6 +23,7 @@ const INITIAL_CONSUMOS = MESES.map((m, i) => ({
 export default function App() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { startNextStep } = useNextStep();
 
   const [tab, setTab] = useState("config");
   const [configTab, setConfigTab] = useState("cuenta");
@@ -49,11 +51,31 @@ export default function App() {
   const [selectedRateIdx, setSelectedRateIdx] = useState(0);
   const [selectedMesIdx, setSelectedMesIdx] = useState(0);
 
+  // Sync tabs with tour steps
+  const { currentStep, currentTour } = useNextStep();
+
+  useEffect(() => {
+    if (currentTour === 'mainTour') {
+      if (currentStep === 1 || currentStep === 2) setTab("config");
+      else if (currentStep === 3 || currentStep === 4) setTab("consumos");
+      else if (currentStep === 5 || currentStep === 6) setTab("resultados");
+    }
+  }, [currentStep, currentTour]);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     } else if (status === "authenticated") {
       fetchData();
+      
+      // Auto-start tour if never seen
+      const hasSeenTour = localStorage.getItem("hasSeenCourelTour");
+      if (!hasSeenTour) {
+        setTimeout(() => {
+          startNextStep("mainTour");
+          localStorage.setItem("hasSeenCourelTour", "true");
+        }, 1000);
+      }
     }
   }, [status]);
 
@@ -267,11 +289,11 @@ export default function App() {
   if (status === "loading" || !session) return null;
 
   // -- RENDERING --
-  const renderConfig = () => {
+  const renderConfig = (isActive: boolean) => {
     const isAdmin = (session?.user as any)?.role === "admin";
 
     return (
-      <div className="page active">
+      <div className={`page ${isActive ? 'active' : ''}`} style={isActive ? { display: 'block' } : { display: 'none' }}>
         {isAdmin && (
           <div className="sec-tabs" style={{ marginBottom: "1.5rem", display: "flex", gap: "1rem", borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem" }}>
             <button className={`tab-btn-sm ${configTab === 'cuenta' ? 'active' : ''}`} onClick={() => setConfigTab('cuenta')}>Mi Cuenta</button>
@@ -411,7 +433,7 @@ export default function App() {
               <span className="sec-title">
                 {configTab === 'tarifas' ? 'Tarifas Públicas' : 'Mis tarifas personalizadas'}
               </span>
-              <button className="btn-primary btn-sm" onClick={() => openForm(-1)}>+ Añadir tarifa</button>
+              <button id="add-rate-btn" className="btn-primary btn-sm" onClick={() => openForm(-1)}>+ Añadir tarifa</button>
             </div>
 
             {showForm && (
@@ -504,7 +526,7 @@ export default function App() {
     );
   };
 
-  const renderConsumos = () => {
+  const renderConsumos = (isActive: boolean) => {
     // Chart data: latest 12 entries, chronologically
     const chartData = [...consumos]
       .sort((a, b) => (a.year * 12 + a.month) - (b.year * 12 + b.month))
@@ -516,7 +538,7 @@ export default function App() {
     const yTop = Math.round(maxCons);
 
     return (
-      <div className="page active">
+      <div className={`page ${isActive ? 'active' : ''}`} style={isActive ? { display: 'block' } : { display: 'none' }}>
         {consumos.length > 0 && (
           <div className="card">
             <div className="sec-head">
@@ -558,7 +580,7 @@ export default function App() {
         <div className="card">
           <div className="sec-head">
             <span className="sec-title">Historial de Consumo</span>
-            <button className="btn-primary btn-sm" onClick={() => setShowConsForm(!showConsForm)}>
+            <button id="add-consumption-btn" className="btn-primary btn-sm" onClick={() => setShowConsForm(!showConsForm)}>
               {showConsForm ? "Cancelar" : "+ Añadir Mes"}
             </button>
           </div>
@@ -650,10 +672,10 @@ export default function App() {
     );
   };
 
-  const renderResultados = () => {
+  const renderResultados = (isActive: boolean) => {
     if (!rates.length || !costs.peajeP1 || !consumos.length) {
       return (
-        <div className="page active">
+        <div className={`page ${isActive ? 'active' : ''}`} style={isActive ? { display: 'block' } : { display: 'none' }}>
           <div className="empty">
             <p>
               {!consumos.length
@@ -688,8 +710,8 @@ export default function App() {
     const tieneExc = mes.exc > 0;
 
     return (
-      <div className="page active">
-        <div className="sec-head" style={{ marginBottom: "1rem" }}><span className="sec-title">Ranking comparativo</span></div>
+      <div className={`page ${isActive ? 'active' : ''}`} style={isActive ? { display: 'block' } : { display: 'none' }}>
+        <div id="ranking-section" className="sec-head" style={{ marginBottom: "1rem" }}><span className="sec-title">Ranking comparativo</span></div>
         <div className="chips">
           <div className="chip"><div className="cl">Mejor tarifa</div><div className="cv">{best.tarifa.comercializadora}</div></div>
           <div className="chip"><div className="cl">Coste total mín.</div><div className="cv">{best.totalAnual.toFixed(2)} €</div></div>
@@ -807,15 +829,15 @@ export default function App() {
 
   return (
     <>
-      <div className="nav" style={{ flexWrap: "wrap", gap: "1rem", paddingTop: "1rem", paddingBottom: "1rem" }}>
+      <div className="nav" id="dashboard-nav" style={{ flexWrap: "wrap", gap: "1rem", paddingTop: "1rem", paddingBottom: "1rem" }}>
         <Link href="/" className="nav-logo" style={{ padding: 0, borderRight: 0, marginRight: 0, textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: "20px", height: "20px" }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
           CourelEnergy
         </Link>
         <div style={{ display: "flex", gap: "10px", marginLeft: "2rem" }}>
-          <button className={`tab-btn ${tab === 'config' ? 'active' : ''}`} onClick={() => setTab('config')}>Configuración</button>
-          <button className={`tab-btn ${tab === 'consumos' ? 'active' : ''}`} onClick={() => setTab('consumos')}>Consumos</button>
-          <button className={`tab-btn ${tab === 'resultados' ? 'active' : ''}`} onClick={() => setTab('resultados')}>Resultados</button>
+          <button id="step-config" className={`tab-btn ${tab === 'config' ? 'active' : ''}`} onClick={() => setTab('config')}>Configuración</button>
+          <button id="step-consumos" className={`tab-btn ${tab === 'consumos' ? 'active' : ''}`} onClick={() => setTab('consumos')}>Consumos</button>
+          <button id="step-resultados" className={`tab-btn ${tab === 'resultados' ? 'active' : ''}`} onClick={() => setTab('resultados')}>Resultados</button>
           <a href="/faq" className="tab-btn" style={{ textDecoration: "none" }} target="_blank" rel="noreferrer">Ayuda</a>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -825,9 +847,9 @@ export default function App() {
       </div>
 
       <div className="app">
-        {tab === 'config' && renderConfig()}
-        {tab === 'consumos' && renderConsumos()}
-        {tab === 'resultados' && renderResultados()}
+        {renderConfig(tab === 'config')}
+        {renderConsumos(tab === 'consumos')}
+        {renderResultados(tab === 'resultados')}
       </div>
 
       <div className="footer">
