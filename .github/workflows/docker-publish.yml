@@ -28,15 +28,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get version from package.json
+        id: pkg-version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            type=raw,value=${{ env.VERSION }}
+            type=raw,value=${{ env.VERSION }}-${{ github.run_number }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
             type=ref,event=branch
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

@@ -113,60 +113,34 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const webhookUrl = process.env.NEXT_PUBLIC_BILL_READER_URL;
-      const user = process.env.NEXT_PUBLIC_BILL_READER_USER;
-      const pass = process.env.NEXT_PUBLIC_BILL_READER_PASS;
-
-      if (!webhookUrl) throw new Error("Webhook URL not configured");
-
-      const auth = btoa(`${user}:${pass}`);
-      const res = await fetch(webhookUrl, {
+      const res = await fetch("/api/bills/upload", {
         method: "POST",
-        headers: { "Authorization": `Basic ${auth}` },
         body: formData,
-        signal: AbortSignal.timeout(120000)
       });
 
-      if (!res.ok) throw new Error("Error en el lector de facturas");
-      
-      let data = await res.json();
-      console.log("Raw webhook response:", data);
-      
-      if (Array.isArray(data)) data = data[0];
-      const tourOutput = data.output || data;
-      
-      const mapped = {
-        year: tourOutput.anio || tourOutput.year || new Date().getFullYear(),
-        month: tourOutput.mes || tourOutput.month || (new Date().getMonth() + 1),
-        dias: tourOutput.dias || 30,
-        pp1: tourOutput.potencia?.punta || 3.45,
-        pp2: tourOutput.potencia?.valle || 3.45,
-        kp1: tourOutput.consumo?.punta || 0,
-        kp2: tourOutput.consumo?.llano || 0,
-        kp3: tourOutput.consumo?.valle || 0,
-        exc: tourOutput.excedentes?.punta || tourOutput.exc || 0
-      };
-
-      const saveRes = await fetch("/api/consumptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mapped),
-      });
-
-      if (saveRes.ok) {
-        const nc = await saveRes.json();
-        const idx = consumos.findIndex(c => c.year === nc.year && c.month === nc.month);
-        if (idx > -1) {
-          const nw = [...consumos];
-          nw[idx] = nc;
-          setConsumos(nw);
-        } else {
-          setConsumos([...consumos, nc].sort((a, b) => (b.year * 12 + b.month) - (a.year * 12 + a.month)));
-        }
+      if (!res.ok) {
+        let msg = "Error al procesar la factura";
+        try {
+          const err = await res.json();
+          if (err.error) msg = err.error;
+        } catch(e) {}
+        throw new Error(msg);
       }
+      
+      const nc = await res.json();
+      
+      const idx = consumos.findIndex(c => c.year === nc.year && c.month === nc.month);
+      if (idx > -1) {
+        const nw = [...consumos];
+        nw[idx] = nc;
+        setConsumos(nw);
+      } else {
+        setConsumos([...consumos, nc].sort((a, b) => (b.year * 12 + b.month) - (a.year * 12 + a.month)));
+      }
+      
     } catch (e: any) {
       console.error(e);
-      alert(e.name === 'TimeoutError' ? "El proceso ha tardado demasiado. Inténtalo de nuevo." : "Error: El formato de respuesta del webhook no es válido o hubo un fallo de red.");
+      alert(`Error: ${e.message || "Fallo de red o servidor."}`);
     } finally {
       setIsUploading(false);
     }
