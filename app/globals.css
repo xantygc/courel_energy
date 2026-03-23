@@ -51,6 +51,14 @@ a {
   100% { transform: rotate(360deg); }
 }
 
+.github-link {
+  color: var(--text3);
+  transition: color 0.2s;
+}
+.github-link:hover {
+  color: var(--text);
+}
+
 /* ── MAIN HEADER ─────────────────────────────── */
 .main-header {
   display: flex;
