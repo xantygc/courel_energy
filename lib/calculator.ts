@@ -1,5 +1,9 @@
 // CÁLCULO (Port fiel del VBA / HTML original)
 
+export function truncate2(num: number) {
+  return Math.trunc(num * 100) / 100;
+}
+
 export function calcPotencia(dias: number, pp1: number, ppp1: number, pp2: number, ppp2: number) {
   return dias * (pp1 * ppp1 + pp2 * ppp2) / 365;
 }
@@ -21,6 +25,7 @@ export function calcValorExcedentes(kwh_exc: number, precio_exc: number) {
 }
 
 export function calcIE(P: number, En: number, valExc: number, totalKwh: number, ie_pct: number, bs: number) {
+  if (ie_pct === 0) return 0;
   const valEn = Math.max(0, En - valExc);
   const iePorBase = (P + valEn) * ie_pct / 100;
   const iePorConsumo = totalKwh * 0.001;
@@ -75,9 +80,9 @@ export function calcFactura(tarifa: any, periodo: any, glob: any, costs: any) {
 
   const cuota = ((+tarifa.cuotaMensual || 0) * 12 / 365) * dias;
 
-  const base = P + enFact + bs + alq + ie + cuota + fbs;
-  const ivaAmt = base * +costs.iva / 100;
-  const total = base + ivaAmt;
+  const base = truncate2(P + enFact + bs + alq + ie + cuota + fbs);
+  const ivaAmt = truncate2(base * +costs.iva / 100);
+  const total = truncate2(base + ivaAmt);
 
   return {
     P, P_BOE, En, peajes, valExc, excAEn, excReg, enFact,
@@ -89,7 +94,8 @@ export function calcFactura(tarifa: any, periodo: any, glob: any, costs: any) {
 
 export function simularAnual(tarifa: any, consumos: any[], glob: any, costs: any) {
   const meses = consumos.map(c => calcFactura(tarifa, c, glob, costs));
-  const totalAnual = meses.reduce((s, m) => s + m.total, 0);
+  const totalAnual = truncate2(meses.reduce((s, m) => s + m.total, 0));
   const totalKwh = meses.reduce((s, m) => s + m.totalKwh, 0);
-  return { tarifa, meses, totalAnual, totalKwh, precioMedio: totalAnual / Math.max(1, totalKwh) * 100 };
+  const precioMedio = truncate2(totalAnual / Math.max(1, totalKwh) * 100);
+  return { tarifa, meses, totalAnual, totalKwh, precioMedio };
 }

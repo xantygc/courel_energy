@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useNextStep } from "nextstepjs";
-import { simularAnual } from "@/lib/calculator";
+import { simularAnual, truncate2 } from "@/lib/calculator";
 
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const DIAS_MES = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -46,6 +46,7 @@ export default function App() {
   const [editingIndex, setEditingIndex] = useState(-1);
   const [formData, setFormData] = useState<any>({});
   const [loadingConfig, setLoadingConfig] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Resultados
   const [selectedRateIdx, setSelectedRateIdx] = useState(0);
@@ -103,6 +104,71 @@ export default function App() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleBillUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const webhookUrl = process.env.NEXT_PUBLIC_BILL_READER_URL;
+      const user = process.env.NEXT_PUBLIC_BILL_READER_USER;
+      const pass = process.env.NEXT_PUBLIC_BILL_READER_PASS;
+
+      if (!webhookUrl) throw new Error("Webhook URL not configured");
+
+      const auth = btoa(`${user}:${pass}`);
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Authorization": `Basic ${auth}` },
+        body: formData,
+        signal: AbortSignal.timeout(120000)
+      });
+
+      if (!res.ok) throw new Error("Error en el lector de facturas");
+      
+      let data = await res.json();
+      console.log("Raw webhook response:", data);
+      
+      if (Array.isArray(data)) data = data[0];
+      const tourOutput = data.output || data;
+      
+      const mapped = {
+        year: tourOutput.anio || tourOutput.year || new Date().getFullYear(),
+        month: tourOutput.mes || tourOutput.month || (new Date().getMonth() + 1),
+        dias: tourOutput.dias || 30,
+        pp1: tourOutput.potencia?.punta || 3.45,
+        pp2: tourOutput.potencia?.valle || 3.45,
+        kp1: tourOutput.consumo?.punta || 0,
+        kp2: tourOutput.consumo?.llano || 0,
+        kp3: tourOutput.consumo?.valle || 0,
+        exc: tourOutput.excedentes?.punta || tourOutput.exc || 0
+      };
+
+      const saveRes = await fetch("/api/consumptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mapped),
+      });
+
+      if (saveRes.ok) {
+        const nc = await saveRes.json();
+        const idx = consumos.findIndex(c => c.year === nc.year && c.month === nc.month);
+        if (idx > -1) {
+          const nw = [...consumos];
+          nw[idx] = nc;
+          setConsumos(nw);
+        } else {
+          setConsumos([...consumos, nc].sort((a, b) => (b.year * 12 + b.month) - (a.year * 12 + a.month)));
+        }
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert(e.name === 'TimeoutError' ? "El proceso ha tardado demasiado. Inténtalo de nuevo." : "Error: El formato de respuesta del webhook no es válido o hubo un fallo de red.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -281,7 +347,7 @@ export default function App() {
     }
   };
 
-  const sumConsumo = (k: string) => consumos.reduce((s, c) => s + (+(c as any)[k] || 0), 0);
+  const sumConsumo = (k: string) => truncate2(consumos.reduce((s, c) => s + (+(c as any)[k] || 0), 0));
 
   const isAdmin = (session?.user as any)?.role === "admin";
   const userId = (session?.user as any)?.id;
@@ -580,9 +646,19 @@ export default function App() {
         <div className="card">
           <div className="sec-head">
             <span className="sec-title">Historial de Consumo</span>
-            <button id="add-consumption-btn" className="btn-primary btn-sm" onClick={() => setShowConsForm(!showConsForm)}>
-              {showConsForm ? "Cancelar" : "+ Añadir Mes"}
-            </button>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button id="add-consumption-btn" className="btn-primary btn-sm" onClick={() => setShowConsForm(!showConsForm)}>
+                {showConsForm ? "Cancelar" : "+ Añadir Mes"}
+              </button>
+              
+              <label className={`btn btn-sm ${isUploading ? 'disabled' : ''}`} style={{ cursor: "pointer", margin: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: "4px" }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                {isUploading ? "Procesando..." : "Subir Factura"}
+                <input type="file" accept="image/*,.pdf" style={{ display: "none" }} 
+                  disabled={isUploading}
+                  onChange={e => e.target.files?.[0] && handleBillUpload(e.target.files[0])} />
+              </label>
+            </div>
           </div>
 
           {showConsForm && (
@@ -657,10 +733,10 @@ export default function App() {
                     <td className="r">{sumConsumo('dias')}</td>
                     <td></td>
                     <td></td>
-                    <td className="r">{sumConsumo('kp1')}</td>
-                    <td className="r">{sumConsumo('kp2')}</td>
-                    <td className="r">{sumConsumo('kp3')}</td>
-                    <td className="r">{sumConsumo('exc')}</td>
+                    <td className="r">{sumConsumo('kp1').toFixed(2)}</td>
+                    <td className="r">{sumConsumo('kp2').toFixed(2)}</td>
+                    <td className="r">{sumConsumo('kp3').toFixed(2)}</td>
+                    <td className="r">{sumConsumo('exc').toFixed(2)}</td>
                     <td></td>
                   </tr>
                 </tfoot>
