@@ -1,13 +1,13 @@
-# Courel Energy ⚡
+# Facturio ⚡
 
-Courel Energy is a specialized, open-source web application designed to help consumers in the regulated and free energy markets accurately simulate and compare their electricity bills. By leveraging real consumption data, users can understand the true impact of their contracted power terms, energy usage patterns (Punta, Llana, Valle), surplus solar generation, and specific utility pricing structures.
+Facturio is a specialized, open-source web application designed to help consumers in the regulated and free energy markets accurately simulate and compare their electricity bills. By leveraging real consumption data, users can understand the true impact of their contracted power terms, energy usage patterns (Punta, Llana, Valle), surplus solar generation, and specific utility pricing structures.
 
 **[Try the Live App Here (Example URL)]()**
 
 ## 🎯 Purpose and Mission
 The energy market can be confusing due to complex billing periods, varying margins on regulated BOE costs, and opaque surplus compensation mechanics. 
 
-Courel Energy aims to provide a **100% transparent and non-profit tool** where users can:
+Facturio aims to provide a **100% transparent and non-profit tool** where users can:
 - Store their historic monthly energy consumption and surplus data.
 - Manage custom tariff configurations (including power terms per kW/year or kW/day).
 - Generate side-by-side invoice simulations to identify the most cost-effective provider (e.g., Octopus, Repsol, Curenergía).

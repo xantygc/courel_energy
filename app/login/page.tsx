@@ -37,7 +37,7 @@ export default function LoginPage() {
     <div className="auth-container">
       <div className="auth-header">
         <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-          <h1 className="auth-title">CourelEnergy</h1>
+          <h1 className="auth-title">Facturio</h1>
         </Link>
         <p className="auth-subtitle">Inicia sesión para continuar</p>
       </div>

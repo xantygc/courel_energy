@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Make Courel Energy comfortably usable on mobile devices (375px - 768px) through targeted CSS improvements without modifying JavaScript or HTML structure.
+**Goal:** Make Facturio comfortably usable on mobile devices (375px - 768px) through targeted CSS improvements without modifying JavaScript or HTML structure.
 
 **Architecture:** Add granular media queries and mobile-specific CSS rules to `globals.css` in an isolated section. All changes are purely presentational (CSS-only) and maintain existing functionality. Conservative approach with surgical, low-risk modifications.
 
@@ -1119,7 +1119,7 @@ Prepare PR description:
 ## Mobile Optimization - Conservative CSS Approach
 
 ### Summary
-Implements comprehensive mobile optimizations for Courel Energy using pure CSS enhancements. Makes the entire application comfortably usable on devices from 375px (small phones) to 768px (tablets).
+Implements comprehensive mobile optimizations for Facturio using pure CSS enhancements. Makes the entire application comfortably usable on devices from 375px (small phones) to 768px (tablets).
 
 ### Approach
 - Conservative: No JavaScript or HTML structure changes

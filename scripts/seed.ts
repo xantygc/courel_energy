@@ -15,7 +15,7 @@ const prisma = prismaClientSingleton()
 
 async function main() {
   const adminId = '1de70a79-da56-462c-82f5-a2017ca0ed9f'
-  const email = 'admin@courelenergy.com'
+  const email = 'admin@Facturio.com'
   const passwordHash = await bcrypt.hash('admin123', 10)
 
   // Upsert the Admin user

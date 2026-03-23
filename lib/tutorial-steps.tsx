@@ -6,7 +6,7 @@ export const steps: Tour[] = [
     steps: [
       {
         icon: '👋',
-        title: '¡Bienvenido a CourelEnergy!',
+        title: '¡Bienvenido a Facturio!',
         content: 'Este tutorial te guiará por las funciones básicas para que puedas empezar a ahorrar en tu factura de la luz.',
         selector: '#dashboard-nav',
         side: 'bottom',
@@ -70,7 +70,7 @@ export const steps: Tour[] = [
       {
         icon: '🎉',
         title: '¡Todo listo!',
-        content: 'Ya puedes empezar a usar CourelEnergy. Si tienes cualquier duda, puedes consultar la sección de Ayuda en cualquier momento.',
+        content: 'Ya puedes empezar a usar Facturio. Si tienes cualquier duda, puedes consultar la sección de Ayuda en cualquier momento.',
         showControls: true,
         showSkip: false,
       },

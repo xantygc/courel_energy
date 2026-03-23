@@ -15,9 +15,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const webhookUrl = process.env.BILL_READER_URL;
-    const user = process.env.BILL_READER_USER;
-    const pass = process.env.BILL_READER_PASS;
+    const webhookUrl = process.env.BILL_READER_URL?.replace(/['"]/g, '').trim();
+    const user = process.env.BILL_READER_USER?.replace(/['"]/g, '').trim();
+    const pass = process.env.BILL_READER_PASS?.replace(/['"]/g, '').trim();
 
     if (!webhookUrl) {
       return NextResponse.json({ error: "Webhook URL not configured on server" }, { status: 500 });

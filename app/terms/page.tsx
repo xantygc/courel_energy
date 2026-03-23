@@ -7,7 +7,7 @@ export default function TermsPage() {
     <div className="auth-container" style={{ maxWidth: "800px", margin: "4rem auto", padding: "0 2rem" }}>
       <div className="auth-header" style={{ textAlign: "left", marginBottom: "2rem" }}>
         <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-          <h1 className="auth-title">CourelEnergy</h1>
+          <h1 className="auth-title">Facturio</h1>
         </Link>
         <p className="auth-subtitle">Términos y Condiciones de Uso</p>
       </div>
@@ -15,7 +15,7 @@ export default function TermsPage() {
       <div className="card" style={{ padding: "2rem", lineHeight: "1.6", color: "var(--text)" }}>
         <section style={{ marginBottom: "1.5rem" }}>
           <h2 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>1. Aceptación de los Términos</h2>
-          <p>Al registrarte en CourelEnergy, aceptas cumplir con estos términos. Si no estás de acuerdo, por favor no utilices el servicio.</p>
+          <p>Al registrarte en Facturio, aceptas cumplir con estos términos. Si no estás de acuerdo, por favor no utilices el servicio.</p>
         </section>
 
         <section style={{ marginBottom: "1.5rem" }}>
@@ -23,14 +23,14 @@ export default function TermsPage() {
           <p>Solicitamos tu correo electrónico únicamente para:</p>
           <ul>
             <li>Gestionar tu cuenta de usuario.</li>
-            <li>Enviarte actualizaciones relacionadas exclusivamente con el proyecto CourelEnergy (mejoras, nuevas funcionalidades o cambios importantes).</li>
+            <li>Enviarte actualizaciones relacionadas exclusivamente con el proyecto Facturio (mejoras, nuevas funcionalidades o cambios importantes).</li>
           </ul>
-          <p><strong>Compromiso de Privacidad:</strong> Nunca venderemos, alquilaremos ni compartiremos tu email con terceros para fines comerciales o publicitarios ajenos a CourelEnergy.</p>
+          <p><strong>Compromiso de Privacidad:</strong> Nunca venderemos, alquilaremos ni compartiremos tu email con terceros para fines comerciales o publicitarios ajenos a Facturio.</p>
         </section>
 
         <section style={{ marginBottom: "1.5rem" }}>
           <h2 style={{ fontSize: "1.25rem", marginBottom: "0.5rem" }}>3. Naturaleza del Servicio</h2>
-          <p>CourelEnergy es una herramienta de simulación gratuita y de código abierto. Aunque nos esforzamos por la exactitud, no garantizamos que los cálculos reflejen exactamente tu factura real debido a la complejidad de las tarifas eléctricas.</p>
+          <p>Facturio es una herramienta de simulación gratuita y de código abierto. Aunque nos esforzamos por la exactitud, no garantizamos que los cálculos reflejen exactamente tu factura real debido a la complejidad de las tarifas eléctricas.</p>
         </section>
 
         <section style={{ marginBottom: "1.5rem" }}>

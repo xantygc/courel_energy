@@ -1,4 +1,4 @@
-# Mobile Optimization Design - Courel Energy
+# Mobile Optimization Design - Facturio
 
 **Date:** 2026-03-16
 **Status:** Approved
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This design addresses mobile usability issues in Courel Energy by applying targeted CSS improvements while maintaining the existing structure and behavior. The goal is to make the entire application comfortably usable on mobile devices (375px - 768px) without modifying JavaScript or HTML structure.
+This design addresses mobile usability issues in Facturio by applying targeted CSS improvements while maintaining the existing structure and behavior. The goal is to make the entire application comfortably usable on mobile devices (375px - 768px) without modifying JavaScript or HTML structure.
 
 **Success Criteria:** The application should be comfortably usable from a personal mobile device without frustration.
 

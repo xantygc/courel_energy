@@ -55,7 +55,7 @@ async function run() {
 
     // Seed admin user
     const adminId = '1de70a79-da56-462c-82f5-a2017ca0ed9f';
-    const adminEmail = 'admin@courelenergy.com';
+    const adminEmail = 'admin@Facturio.com';
     const passwordHash = await bcrypt.hash('Admin1234!', 10);
 
     // Upsert admin
@@ -70,12 +70,12 @@ async function run() {
 
     // Seed rates
     const tarifas = [
-      { com: 'Octopus Energy', nom: 'Octopus 3',      pp1: 35.405, pp2: 9.855, ep1: 19.4, ep2: 11.5, ep3: 7.7, exc: 4.0, em: 0, ekwp: 0 },
-      { com: 'Holaluz',        nom: 'Tarifa Verde 3P', pp1: 35.5,  pp2: 6.2,   ep1: 15.9, ep2: 12.5, ep3: 9.2, exc: 7.0, em: 0, ekwp: 0 },
-      { com: 'Iberdrola',      nom: 'One Luz 3P',      pp1: 38.04, pp2: 6.79,  ep1: 18.5, ep2: 14.2, ep3: 10.1,exc: 5.0, em: 0, ekwp: 0 },
-      { com: 'Endesa',         nom: 'Tempo Fijo 3P',   pp1: 37.59, pp2: 6.49,  ep1: 17.8, ep2: 13.5, ep3: 9.5, exc: 5.5, em: 0, ekwp: 0 },
-      { com: 'Naturgy',        nom: 'Gas + Luz 3.0',   pp1: 36.0,  pp2: 7.2,   ep1: 19.2, ep2: 15.1, ep3: 11.0,exc: 4.8, em: 0, ekwp: 0 },
-      { com: 'Repsol Elec.',   nom: 'Precio Fijo 3P',  pp1: 39.0,  pp2: 6.5,   ep1: 16.9, ep2: 13.0, ep3: 9.8, exc: 6.0, em: 0, ekwp: 0 },
+      { com: 'Octopus Energy', nom: 'Octopus 3', pp1: 35.405, pp2: 9.855, ep1: 19.4, ep2: 11.5, ep3: 7.7, exc: 4.0, em: 0, ekwp: 0 },
+      { com: 'Holaluz', nom: 'Tarifa Verde 3P', pp1: 35.5, pp2: 6.2, ep1: 15.9, ep2: 12.5, ep3: 9.2, exc: 7.0, em: 0, ekwp: 0 },
+      { com: 'Iberdrola', nom: 'One Luz 3P', pp1: 38.04, pp2: 6.79, ep1: 18.5, ep2: 14.2, ep3: 10.1, exc: 5.0, em: 0, ekwp: 0 },
+      { com: 'Endesa', nom: 'Tempo Fijo 3P', pp1: 37.59, pp2: 6.49, ep1: 17.8, ep2: 13.5, ep3: 9.5, exc: 5.5, em: 0, ekwp: 0 },
+      { com: 'Naturgy', nom: 'Gas + Luz 3.0', pp1: 36.0, pp2: 7.2, ep1: 19.2, ep2: 15.1, ep3: 11.0, exc: 4.8, em: 0, ekwp: 0 },
+      { com: 'Repsol Elec.', nom: 'Precio Fijo 3P', pp1: 39.0, pp2: 6.5, ep1: 16.9, ep2: 13.0, ep3: 9.8, exc: 6.0, em: 0, ekwp: 0 },
     ];
 
     for (const t of tarifas) {

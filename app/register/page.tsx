@@ -49,7 +49,7 @@ export default function RegisterPage() {
   return (
     <div className="auth-container">
       <div className="auth-header">
-        <h1 className="auth-title">CourelEnergy</h1>
+        <h1 className="auth-title">Facturio</h1>
         <p className="auth-subtitle">Crea tu cuenta gratis</p>
       </div>
       <div className="card">
@@ -97,7 +97,7 @@ export default function RegisterPage() {
                 style={{ width: "auto", marginTop: "3px" }}
               />
               <label htmlFor="terms" style={{ fontSize: "12px", color: "var(--text2)", cursor: "pointer", fontWeight: "normal" }}>
-                Acepto los <Link href="/terms" target="_blank" style={{ color: "var(--accent)", textDecoration: "underline" }}>Términos y Condiciones</Link> y consiento el uso de mi email para recibir actualizaciones de CourelEnergy.
+                Acepto los <Link href="/terms" target="_blank" style={{ color: "var(--accent)", textDecoration: "underline" }}>Términos y Condiciones</Link> y consiento el uso de mi email para recibir actualizaciones de Facturio.
               </label>
             </div>
             <button disabled={loading} type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: "1rem" }}>
