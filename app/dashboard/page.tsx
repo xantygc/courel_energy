@@ -47,6 +47,7 @@ export default function App() {
   const [formData, setFormData] = useState<any>({});
   const [loadingConfig, setLoadingConfig] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadModal, setUploadModal] = useState<{ show: boolean; type: 'success' | 'error'; message: string } | null>(null);
 
   // Resultados
   const [selectedRateIdx, setSelectedRateIdx] = useState(0);
@@ -109,6 +110,7 @@ export default function App() {
 
   const handleBillUpload = async (file: File) => {
     setIsUploading(true);
+    setUploadModal(null);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -138,9 +140,10 @@ export default function App() {
         setConsumos([...consumos, nc].sort((a, b) => (b.year * 12 + b.month) - (a.year * 12 + a.month)));
       }
       
+      setUploadModal({ show: true, type: 'success', message: "La factura ha sido procesada y guardada correctamente en tu historial." });
     } catch (e: any) {
       console.error(e);
-      alert(`Error: ${e.message || "Fallo de red o servidor."}`);
+      setUploadModal({ show: true, type: 'error', message: e.message || "Fallo de red o servidor al subir la factura." });
     } finally {
       setIsUploading(false);
     }
@@ -929,6 +932,35 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {isUploading && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.6)", zIndex: 9999, display: "flex", justifyContent: "center", alignItems: "center", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "var(--bg)", padding: "2.5rem", borderRadius: "12px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem", boxShadow: "0 10px 25px rgba(0,0,0,0.5)" }}>
+            <div style={{ width: "48px", height: "48px", border: "4px solid var(--border)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+            <span style={{ fontWeight: 600, fontSize: "1.1rem" }}>Procesando factura...</span>
+            <span style={{ color: "var(--text3)", fontSize: "0.85rem", textAlign: "center", maxWidth: "250px" }}>Esto puede tardar unos momentos dependiendo del tamaño del archivo.</span>
+          </div>
+        </div>
+      )}
+
+      {uploadModal?.show && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.6)", zIndex: 10000, display: "flex", justifyContent: "center", alignItems: "center", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "var(--bg)", padding: "2rem", borderRadius: "12px", border: "1px solid var(--border)", maxWidth: "420px", width: "90%", display: "flex", flexDirection: "column", gap: "1.5rem", boxShadow: "0 10px 25px rgba(0,0,0,0.5)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              {uploadModal.type === 'success' ? (
+                <svg style={{ color: "var(--accent)", width: "28px", height: "28px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+              ) : (
+                <svg style={{ color: "var(--red)", width: "28px", height: "28px" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              )}
+              <h3 style={{ margin: 0, fontSize: "1.25rem" }}>{uploadModal.type === 'success' ? 'Carga Exitosa' : 'Aviso'}</h3>
+            </div>
+            <p style={{ margin: 0, color: "var(--text)", lineHeight: 1.5, fontSize: "1rem" }}>{uploadModal.message}</p>
+            <button className={uploadModal.type === 'success' ? 'btn-primary' : 'btn'} style={{ width: "100%", justifyContent: "center", marginTop: "0.5rem", border: uploadModal.type === 'error' ? "1px solid var(--red)" : "" }} onClick={() => setUploadModal(null)}>
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
